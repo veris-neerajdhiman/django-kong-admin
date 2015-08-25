@@ -17,9 +17,9 @@ dependencies:
         - pip install -U pip
     override:
         - pip install -U tox==2.1.1
-        - pip install -U docker-compose==1.3.3
         - docker version
         - docker info
+        - docker-compose --version
         - if [[ -e ~/docker/cassandra.tar ]]; then docker load --input ~/docker/cassandra.tar; fi
         - docker pull mashape/cassandra
         - mkdir -p ~/docker; docker save mashape/cassandra > ~/docker/cassandra.tar

@@ -30,14 +30,14 @@ dependencies:
             docker run -d
             -p 9042:9042
             --name cassandra
-            mashape/cassandra
+            mashape/cassandra; sleep 5
         - >
             docker run -d
             -p 8000:8000
             -p 8001:8001
             --name kong
             --link cassandra:cassandra
-            dirkmoors/kong
+            dirkmoors/kong; sleep 5
 test:
     override:
         - tox

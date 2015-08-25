@@ -27,8 +27,8 @@ if sys.argv[-1] == 'tag':
     os.system("git push --tags")
     sys.exit()
 
-readme = open('README.rst').read()
-history = open('CHANGELOG.rst').read().replace('.. :changelog:', '')
+readme = open(os.path.join(BASE_DIR, 'README.rst'),).read()
+history = open(os.path.join(BASE_DIR, 'CHANGELOG.rst')).read().replace('.. :changelog:', '')
 
 requirements = [str(ir.req) for ir in parse_requirements(os.path.join(BASE_DIR, 'requirements.txt'), session=False)]
 

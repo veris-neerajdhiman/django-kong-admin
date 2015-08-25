@@ -3,7 +3,7 @@ source = kong_admin
 
 [run]
 branch = True
-source = src
+source = kong_admin
 ; parallel = true
 
 [report]

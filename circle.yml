@@ -4,7 +4,7 @@ machine:
     python:
         version: 2.7.6
     environment:
-        PYKONG_TEST_API_URL: http://localhost:8001
+        KONG_ADMIN_URL: http://localhost:8001
         PIP_CACHE_DIR: ~/pip-cache
     post:
         - pyenv global pypy-2.4.0 2.6.8 2.7.9 3.3.3 3.4.2

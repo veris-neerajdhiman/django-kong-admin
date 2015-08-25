@@ -17,6 +17,8 @@ develop-eggs
 .installed.cfg
 lib
 lib64
+venv*/
+pyvenv*/
 
 # Installer logs
 pip-log.txt
@@ -24,7 +26,13 @@ pip-log.txt
 # Unit test / coverage reports
 .coverage
 .tox
+.coverage.*
+.coverage-reports/
 nosetests.xml
+htmlcov
+target/
+coverage.xml
+test-reports/
 
 # Translations
 *.mo
@@ -33,6 +41,9 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+.idea
+*.iml
+*.komodoproject
 
 # Complexity
 output/*.html
@@ -41,7 +52,16 @@ output/*/index.html
 # Sphinx
 docs/_build
 
-# SqLite
-db.sqlite3
+.DS_Store
+*~
+.*.sw[po]
+.build
+.ve
+.env
+.cache
+.pytest
+.bootstrap
+*.bak
 
-.idea/
+# Dev DB
+db.sqlite3

@@ -119,7 +119,6 @@ class APIReferenceLogicTestCase(TestCase):
         self.assertEqual(result['public_dns'], api_ref.public_dns)
         self.assertEqual(result['name'], new_name)
 
-
     def test_withdraw(self):
         # Create api_ref
         api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())

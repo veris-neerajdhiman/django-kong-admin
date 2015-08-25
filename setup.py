@@ -3,6 +3,7 @@
 
 import os
 import sys
+from pip.req import parse_requirements
 
 import kong_admin
 
@@ -12,6 +13,8 @@ except ImportError:
     from distutils.core import setup
 
 version = kong_admin.__version__
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
@@ -25,7 +28,9 @@ if sys.argv[-1] == 'tag':
     sys.exit()
 
 readme = open('README.rst').read()
-history = open('HISTORY.rst').read().replace('.. :changelog:', '')
+history = open('CHANGELOG.rst').read().replace('.. :changelog:', '')
+
+requirements = [str(ir.req) for ir in parse_requirements(os.path.join(BASE_DIR, 'requirements.txt'), session=False)]
 
 setup(
     name='django-kong-admin',
@@ -39,8 +44,7 @@ setup(
         'kong_admin',
     ],
     include_package_data=True,
-    install_requires=[
-    ],
+    install_requires=requirements,
     license="BSD",
     zip_safe=False,
     keywords='django-kong-admin',

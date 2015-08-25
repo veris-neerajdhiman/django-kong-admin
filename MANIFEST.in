@@ -1,6 +1,27 @@
+graft docs
+graft kong_admin
+graft tests
+
+include .bumpversion.cfg
+include .coveragerc
+include .cookiecutterrc
+include .isort.cfg
+include .pylintrc
+include .coveralls.yml
+
+include Makefile
+
+include circle.yml
+include docker-compose.yml
+include manage.py
+include *.txt
+
 include AUTHORS.rst
+include CHANGELOG.rst
 include CONTRIBUTING.rst
-include HISTORY.rst
 include LICENSE
 include README.rst
-recursive-include kong_admin *.html *.png *.gif *js *.css *jpg *jpeg *svg *py
+
+include tox.ini .travis.yml appveyor.yml
+
+global-exclude *.py[cod] __pycache__ *.so

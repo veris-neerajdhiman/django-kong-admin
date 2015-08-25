@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from django.conf import settings
-from django.utils.lru_cache import lru_cache
-from django.utils.module_loading import import_string
 
 from .sync.apis import APISyncEngine
 from .sync.consumers import ConsumerSyncEngine

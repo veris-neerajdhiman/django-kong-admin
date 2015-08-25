@@ -52,7 +52,7 @@ class ConsumerSyncEngine(KongProxySyncEngine):
         return uuid.UUID(consumer_struct['id'])
 
     def on_withdraw_by_id(self, client, kong_id, parent_kong_id=None):
-         client.consumers.delete(str(kong_id))
+        client.consumers.delete(str(kong_id))
 
     def after_publish(self, client, obj):
         self.basic_auth().synchronize(client, BasicAuthReference.objects.filter(consumer=obj), delete=True)

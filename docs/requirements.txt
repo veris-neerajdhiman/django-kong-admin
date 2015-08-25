@@ -1,0 +1,5 @@
+six
+docutils
+Jinja2
+sphinx
+-e .

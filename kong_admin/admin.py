@@ -213,7 +213,7 @@ class OAuthInline(admin.StackedInline):
 
 
 class ConsumerReferenceAdmin(CustomModelAdmin):
-    list_display = ('username_or_custom_id','enabled', 'synchronized', 'kong_id')
+    list_display = ('username_or_custom_id', 'enabled', 'synchronized', 'kong_id')
     list_display_buttons = [{
         'caption': 'Synchronize',
         'url': 'sync-consumer-ref/',

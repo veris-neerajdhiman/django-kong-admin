@@ -42,7 +42,7 @@ class BasicAuthReferenceFactory(factory.DjangoModelFactory):
     class Meta:
         model = BasicAuthReference
 
-    username = factory.Sequence(lambda n: fake.user_name().encode('utf-8'))
+    username = factory.Sequence(lambda n: ('%s%s' % (fake.user_name(), n)).encode('utf-8'))
     password = factory.Sequence(lambda n: fake.password(
         length=10, special_chars=True, digits=True, upper_case=True, lower_case=True).encode('utf-8'))
 
@@ -59,7 +59,7 @@ class OAuth2ReferenceFactory(factory.DjangoModelFactory):
     class Meta:
         model = OAuth2Reference
 
-    name = factory.Sequence(lambda n: fake.word().encode('utf-8'))
+    name = factory.Sequence(lambda n: ('%s%s' % (fake.word(), n)).encode('utf-8'))
     redirect_uri = factory.Sequence(lambda n: fake.uri().encode('utf-8'))
 
 __all__ = [APIReferenceFactory, PluginConfigurationReferenceFactory, PluginConfigurationFieldFactory,

@@ -278,7 +278,7 @@ class APIReferenceLogicTestCase(TestCase):
         with self.assertRaises(ValueError):
             _ = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_kong_id)
 
-    def test_update_synchronized_plugin_configuration(self):
+    def test_disable_synchronized_plugin_configuration(self):
         # Create api_ref
         api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
 
@@ -304,13 +304,51 @@ class APIReferenceLogicTestCase(TestCase):
         self.assertTrue(result['enabled'])
 
         # Update plugin_configuration
-        logic.update_plugin_configuration(self.client, plugin_configuration_ref, enabled=False)
+        logic.enable_plugin_configuration(self.client, plugin_configuration_ref, enabled=False)
 
         # Check
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['name'], plugin_configuration_ref.name)
         self.assertFalse(result['enabled'])
+
+    def test_update_synchronized_plugin_configuration(self):
+        # Create api_ref
+        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+
+        # Mark for auto cleanup
+        self._cleanup_afterwards(api_ref)
+
+        # Publish api
+        logic.synchronize_api(self.client, api_ref)
+
+        # Create plugin_configuration
+        plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref)
+
+        # Create plugin_configuration field
+        plugin_configuration_field = PluginConfigurationFieldFactory(configuration=plugin_configuration_ref)
+
+        # Publish plugin_configuration
+        logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
+
+        # Check
+        result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
+        self.assertIsNotNone(result)
+        self.assertEqual(result['name'], plugin_configuration_ref.name)
+        self.assertEqual(result['value'][plugin_configuration_field.property], plugin_configuration_field.value)
+
+        # Update plugin_configuration
+        new_value = 5
+        self.assertNotEqual(new_value, plugin_configuration_field.value)
+        plugin_configuration_field.value = new_value
+        plugin_configuration_field.save()
+        logic.publish_plugin_configuration(self.client, plugin_configuration_ref)
+
+        # Check
+        result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
+        self.assertIsNotNone(result)
+        self.assertEqual(result['name'], plugin_configuration_ref.name)
+        self.assertEqual(result['value'][plugin_configuration_field.property], new_value)
 
     def _cleanup_afterwards(self, api_ref):
         self._cleanup_api.append(api_ref)

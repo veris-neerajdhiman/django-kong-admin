@@ -41,7 +41,7 @@ def withdraw_plugin_configuration(client, obj):
     return obj
 
 
-def update_plugin_configuration(client, obj, enabled):
+def enable_plugin_configuration(client, obj, enabled=True):
     obj.enabled = enabled
     obj = get_api_sync_engine().plugins().publish(client, obj)
 
@@ -53,7 +53,7 @@ def update_plugin_configuration(client, obj, enabled):
 
 def synchronize_plugin_configuration(client, obj, toggle=False):
     enabled = not obj.enabled if toggle else obj.enabled
-    return update_plugin_configuration(client, obj, enabled=enabled)
+    return enable_plugin_configuration(client, obj, enabled=enabled)
 
 
 def synchronize_plugin_configurations(client, queryset=None):

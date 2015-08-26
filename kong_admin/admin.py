@@ -19,7 +19,7 @@ from .contrib import CustomModelAdmin
 def synchronize_api_references(request, queryset=None):
     try:
         with closing(get_kong_client()) as client:
-            queryset = synchronize_apis(client, queryset=queryset, delete=True)
+            queryset = synchronize_apis(client, queryset=queryset)
     except Exception as e:
         messages.add_message(
             request, messages.ERROR, 'Could not synchronize API References: %s' % str(e))

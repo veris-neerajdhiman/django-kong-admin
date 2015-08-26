@@ -583,7 +583,7 @@ class ConsumerReferenceLogicTestCase(TestCase):
 
         # Create auth
         auth_ref1 = BasicAuthReferenceFactory(consumer=consumer_ref)
-        auth_ref2 = BasicAuthReferenceFactory(consumer=consumer_ref)
+        BasicAuthReferenceFactory(consumer=consumer_ref)
 
         # Publish
         logic.synchronize_consumer(self.client, consumer_ref)
@@ -609,6 +609,128 @@ class ConsumerReferenceLogicTestCase(TestCase):
         # Check
         with self.assertRaises(ValueError):
             self.client.consumers.basic_auth(consumer_kong_id).count()
+
+    def test_sync_consumer_key_auth(self):
+        # Create consumer_ref
+        consumer_ref = ConsumerReferenceFactory(username=fake.consumer_name())
+
+        # Mark for auto cleanup
+        self._cleanup_afterwards(consumer_ref)
+
+        # Publish
+        logic.synchronize_consumer(self.client, consumer_ref)
+        self.assertTrue(consumer_ref.synchronized)
+
+        # Check kong
+        amount = self.client.consumers.key_auth(consumer_ref.kong_id).count()
+        self.assertEqual(amount, 0)
+
+        # Create auth
+        auth_ref = KeyAuthReferenceFactory(consumer=consumer_ref)
+
+        # Publish
+        logic.synchronize_consumer(self.client, consumer_ref)
+        self.assertTrue(consumer_ref.synchronized)
+
+        # Reload
+        auth_ref = models.KeyAuthReference.objects.get(id=auth_ref.id)
+        self.assertIsNotNone(auth_ref.kong_id)
+
+        # Check kong
+        result = self.client.consumers.key_auth(consumer_ref.kong_id).retrieve(auth_ref.kong_id)
+        self.assertIsNotNone(result)
+        self.assertEqual(result['key'], auth_ref.key)
+
+    def test_sync_consumer_multiple_key_auth(self):
+        amount = 3
+
+        # Create consumer_ref
+        consumer_ref = ConsumerReferenceFactory(username=fake.consumer_name())
+
+        # Mark for auto cleanup
+        self._cleanup_afterwards(consumer_ref)
+
+        # Create auths
+        auths = []
+        for i in range(amount):
+            auths.append(KeyAuthReferenceFactory(consumer=consumer_ref))
+
+        # Publish
+        logic.synchronize_consumer(self.client, consumer_ref)
+        self.assertTrue(consumer_ref.synchronized)
+
+        # Check
+        self.assertEqual(self.client.consumers.key_auth(consumer_ref.kong_id).count(), amount)
+
+        # Reload
+        for i in range(len(auths)):
+            auths[i] = models.KeyAuthReference.objects.get(id=auths[i].id)
+            self.assertIsNotNone(auths[i].kong_id)
+
+        # Check kong
+        result = self.client.consumers.key_auth(consumer_ref.kong_id).list()
+        self.assertIsNotNone(result)
+        self.assertEqual(
+            sorted([(uuid.UUID(r['id']), r['key']) for r in result['data']], key=lambda x: x[0]),
+            sorted([(obj.kong_id, obj.key) for obj in auths], key=lambda x: x[0]))
+
+    def test_withdraw_consumer_key_auth(self):
+        # Create consumer_ref
+        consumer_ref = ConsumerReferenceFactory(username=fake.consumer_name())
+
+        # Create auth
+        auth_ref = KeyAuthReferenceFactory(consumer=consumer_ref)
+
+        # Publish
+        logic.synchronize_consumer(self.client, consumer_ref)
+        self.assertTrue(consumer_ref.synchronized)
+
+        # Reload
+        auth_ref = models.KeyAuthReference.objects.get(id=auth_ref.id)
+        self.assertIsNotNone(auth_ref.kong_id)
+        self.assertTrue(auth_ref.synchronized)
+
+        # Withdraw
+        logic.withdraw_consumer(self.client, consumer_ref)
+        self.assertFalse(consumer_ref.synchronized)
+
+        # Reload
+        auth_ref = models.KeyAuthReference.objects.get(id=auth_ref.id)
+        self.assertIsNone(auth_ref.kong_id)
+        self.assertFalse(auth_ref.synchronized)
+
+    def test_delete_consumer_key_auth(self):
+        # Create consumer_ref
+        consumer_ref = ConsumerReferenceFactory(username=fake.consumer_name())
+
+        # Create auth
+        auth_ref1 = KeyAuthReferenceFactory(consumer=consumer_ref)
+        KeyAuthReferenceFactory(consumer=consumer_ref)
+
+        # Publish
+        logic.synchronize_consumer(self.client, consumer_ref)
+        self.assertTrue(consumer_ref.synchronized)
+
+        # Check
+        self.assertEqual(self.client.consumers.key_auth(consumer_ref.kong_id).count(), 2)
+
+        # Delete auth_ref1
+        auth_ref1.delete()
+
+        # Publish
+        logic.synchronize_consumer(self.client, consumer_ref)
+        self.assertTrue(consumer_ref.synchronized)
+
+        # Check
+        self.assertEqual(self.client.consumers.key_auth(consumer_ref.kong_id).count(), 1)
+
+        # Delete consumer
+        consumer_kong_id = consumer_ref.kong_id
+        consumer_ref.delete()
+
+        # Check
+        with self.assertRaises(ValueError):
+            self.client.consumers.key_auth(consumer_kong_id).count()
 
     def _cleanup_afterwards(self, consumer_ref):
         self._cleanup_consumers.append(consumer_ref)

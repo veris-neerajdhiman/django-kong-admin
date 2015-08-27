@@ -6,13 +6,15 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin, messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http.response import HttpResponseRedirect
+from jsonfield2.fields import JSONField
 
-from .models import APIReference, PluginConfigurationReference, PluginConfigurationField, ConsumerReference, \
+from .models import APIReference, PluginConfigurationReference, ConsumerReference, \
     BasicAuthReference, KeyAuthReference, OAuth2Reference
 from .factory import get_kong_client
 from .logic import synchronize_apis, synchronize_api, synchronize_plugin_configurations, \
     synchronize_plugin_configuration, synchronize_consumers, synchronize_consumer
 from .contrib import CustomModelAdmin
+from .widgets import JSONWidget
 
 
 @staff_member_required
@@ -121,6 +123,15 @@ def get_toggle_enable_caption(obj):
     return 'Disable' if obj.enabled else 'Enable'
 
 
+class PluginConfigurationReferenceInline(admin.StackedInline):
+    model = PluginConfigurationReference
+    extra = 0
+    fields = ('name', 'value', 'enabled', 'consumer')
+    formfield_overrides = {
+        JSONField: {'widget': JSONWidget(mode='json', width='800px', height='180px', theme='twilight')},
+    }
+
+
 class APIReferenceAdmin(CustomModelAdmin):
     list_display = ('target_url', 'name', 'public_dns', 'path', 'enabled', 'synchronized', 'kong_id')
     list_display_buttons = [{
@@ -149,49 +160,45 @@ class APIReferenceAdmin(CustomModelAdmin):
             'fields': ('created_at', 'updated_at')
         }),
     )
+    inlines = [
+        PluginConfigurationReferenceInline
+    ]
     readonly_fields = ('created_at', 'updated_at')
 
 admin.site.register(APIReference, APIReferenceAdmin)
 
 
-class PluginConfigurationFieldInline(admin.StackedInline):
-    model = PluginConfigurationField
-
-
-class PluginConfigurationReferenceAdmin(CustomModelAdmin):
-    list_display = ('name', 'api', 'enabled', 'synchronized', 'kong_id')
-    list_display_buttons = [{
-        'caption': 'Synchronize',
-        'url': 'sync-plugin-configuration-ref/',
-        'view': synchronize_plugin_configuration_reference
-    }, {
-        'caption': get_toggle_enable_caption,
-        'url': 'toggle-enable/',
-        'view': lambda request, pk: synchronize_plugin_configuration_reference(request, pk, toggle_enable=True)
-    }]
-    action_buttons = [{
-        'caption': 'Synchronize all',
-        'url': 'sync-plugin-configuration-refs/',
-        'view': synchronize_plugin_configuration_references
-    }]
-    list_select_related = True
-    fieldsets = (
-        (None, {
-            'fields': ('name', 'enabled',)
-        }),
-        (_('Target'), {
-            'fields': ('api', 'consumer')
-        }),
-        (_('Audit'), {
-            'fields': ('created_at', 'updated_at')
-        }),
-    )
-    inlines = [
-        PluginConfigurationFieldInline
-    ]
-    readonly_fields = ('created_at', 'updated_at')
-
-admin.site.register(PluginConfigurationReference, PluginConfigurationReferenceAdmin)
+# class PluginConfigurationReferenceAdmin(CustomModelAdmin):
+#     list_display = ('name', 'api', 'enabled', 'synchronized', 'kong_id')
+#     list_display_buttons = [{
+#         'caption': 'Synchronize',
+#         'url': 'sync-plugin-configuration-ref/',
+#         'view': synchronize_plugin_configuration_reference
+#     }, {
+#         'caption': get_toggle_enable_caption,
+#         'url': 'toggle-enable/',
+#         'view': lambda request, pk: synchronize_plugin_configuration_reference(request, pk, toggle_enable=True)
+#     }]
+#     action_buttons = [{
+#         'caption': 'Synchronize all',
+#         'url': 'sync-plugin-configuration-refs/',
+#         'view': synchronize_plugin_configuration_references
+#     }]
+#     list_select_related = True
+#     fieldsets = (
+#         (None, {
+#             'fields': ('name', 'enabled', 'value')
+#         }),
+#         (_('Target'), {
+#             'fields': ('api', 'consumer')
+#         }),
+#         (_('Audit'), {
+#             'fields': ('created_at', 'updated_at')
+#         }),
+#     )
+#     readonly_fields = ('created_at', 'updated_at')
+#
+# admin.site.register(PluginConfigurationReference, PluginConfigurationReferenceAdmin)
 
 
 class BasicAuthInline(admin.StackedInline):

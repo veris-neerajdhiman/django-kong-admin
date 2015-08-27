@@ -22,7 +22,7 @@ django-kong-admin
 
 .. |coveralls| image:: http://img.shields.io/coveralls/vikingco/django-kong-admin/master.svg?style=flat&label=Coveralls
     :alt: Coverage Status
-    :target: https://coveralls.io/r/vikingco/django-kong-admin
+    :target: https://coveralls.io/github/vikingco/django-kong-admin
 
 .. |version| image:: http://img.shields.io/pypi/v/django-kong-admin.svg?style=flat
     :alt: PyPI Package latest release

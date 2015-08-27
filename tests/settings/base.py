@@ -23,6 +23,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # https://github.com/DarioGT/django-jsonfield2
+    'jsonfield2',
+
+    # https://github.com/bradleyayers/django-ace
+    'django_ace',
+
     'kong_admin'
 )
 MIDDLEWARE_CLASSES = (

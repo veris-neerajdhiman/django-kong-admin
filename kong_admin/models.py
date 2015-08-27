@@ -6,6 +6,8 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
+from jsonfield2 import JSONField, JSONAwareManager
+
 from kong.exceptions import ConflictError
 from .enums import Plugins
 
@@ -61,6 +63,9 @@ class PluginConfigurationReference(KongProxyModel):
     consumer = models.ForeignKey('ConsumerReference', null=True, blank=True, related_name='plugins')
     name = models.CharField(_('Plugin Name'), choices=Plugins.choices(), max_length=32)
     enabled = models.BooleanField(default=True)
+    value = JSONField(default={})
+
+    objects = JSONAwareManager(json_fields=['value'])
 
     class Meta:
         verbose_name = _('Plugin Configuration Reference')
@@ -71,18 +76,18 @@ class PluginConfigurationReference(KongProxyModel):
         return self.name
 
 
-@python_2_unicode_compatible
-class PluginConfigurationField(models.Model):
-    configuration = models.ForeignKey(PluginConfigurationReference, related_name='fields')
-    property = models.CharField(max_length=32)
-    value = models.CharField(max_length=32)
-
-    class Meta:
-        verbose_name = _('Plugin Configuration Field')
-        verbose_name_plural = _('Plugin Configuration Fields')
-
-    def __str__(self):
-        return '%s = %s' % (self.property, self.value)
+# @python_2_unicode_compatible
+# class PluginConfigurationField(models.Model):
+#     configuration = models.ForeignKey(PluginConfigurationReference, related_name='fields')
+#     property = models.CharField(max_length=32)
+#     value = models.CharField(max_length=32)
+#
+#     class Meta:
+#         verbose_name = _('Plugin Configuration Field')
+#         verbose_name_plural = _('Plugin Configuration Fields')
+#
+#     def __str__(self):
+#         return '%s = %s' % (self.property, self.value)
 
 
 @python_2_unicode_compatible

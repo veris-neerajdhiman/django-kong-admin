@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from kong.exceptions import ConflictError
-from kong_admin.models import APIReference, PluginConfigurationReference, PluginConfigurationField
+from kong_admin.models import APIReference, PluginConfigurationReference
 
 from .base import KongProxySyncEngine
 
@@ -76,21 +76,22 @@ class PluginConfigurationSyncEngine(KongProxySyncEngine):
         return 'api_id'
 
     def on_publish(self, client, obj):
-        fields = {}
-
-        for field in PluginConfigurationField.objects.filter(configuration=obj):
-            fields[field.property] = field.value
-
         api_kong_id = obj.api.kong_id
         consumer_kong_id = obj.consumer.kong_id if obj.consumer is not None else None
 
         try:
             plugin_configuration_struct = client.apis.plugins(str(api_kong_id)).create_or_update(
                 plugin_configuration_id=obj.kong_id, plugin_name=obj.name, enabled=obj.enabled,
-                consumer_id=consumer_kong_id, **fields)
+                consumer_id=consumer_kong_id, **obj.value)
         except ConflictError:
             plugin_configuration_struct = client.apis.plugins(str(api_kong_id)).update(
-                plugin_name=obj.name, enabled=obj.enabled, consumer_id=consumer_kong_id, **fields)
+                plugin_name=obj.name, enabled=obj.enabled, consumer_id=consumer_kong_id, **obj.value)
+
+        value = plugin_configuration_struct['value']
+
+        if obj.value != value:
+            obj.value = value
+            self.get_proxy_class().objects.filter(id=obj.id).update(value=obj.value)
 
         return plugin_configuration_struct['id']
 

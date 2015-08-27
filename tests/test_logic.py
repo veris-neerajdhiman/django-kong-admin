@@ -7,8 +7,8 @@ from kong_admin import models
 from kong_admin.factory import get_kong_client
 from kong_admin import logic
 
-from .factories import APIReferenceFactory, PluginConfigurationReferenceFactory, PluginConfigurationFieldFactory, \
-    ConsumerReferenceFactory, BasicAuthReferenceFactory, KeyAuthReferenceFactory, OAuth2ReferenceFactory
+from .factories import APIReferenceFactory, PluginConfigurationReferenceFactory, ConsumerReferenceFactory, \
+    BasicAuthReferenceFactory, KeyAuthReferenceFactory, OAuth2ReferenceFactory
 from .fake import fake
 
 
@@ -181,7 +181,7 @@ class APIReferenceLogicTestCase(TestCase):
         self.assertEqual(result['target_url'], api_ref.target_url)
 
         # Create plugin_configuration
-        plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref)
+        plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref, value={})
 
         # Attempt to publish
         with self.assertRaises(ValueError):
@@ -205,9 +205,6 @@ class APIReferenceLogicTestCase(TestCase):
         # Create plugin_configuration
         plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref)
 
-        # Create plugin_configuration field
-        PluginConfigurationFieldFactory(configuration=plugin_configuration_ref)
-
         # Publish plugin_configuration
         logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
 
@@ -228,9 +225,6 @@ class APIReferenceLogicTestCase(TestCase):
 
         # Create plugin_configuration
         plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref)
-
-        # Create plugin_configuration field
-        PluginConfigurationFieldFactory(configuration=plugin_configuration_ref)
 
         # Publish plugin_configuration
         logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
@@ -260,9 +254,6 @@ class APIReferenceLogicTestCase(TestCase):
         # Create plugin_configuration
         plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref)
 
-        # Create plugin_configuration field
-        PluginConfigurationFieldFactory(configuration=plugin_configuration_ref)
-
         # Publish plugin_configuration
         logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
 
@@ -291,9 +282,6 @@ class APIReferenceLogicTestCase(TestCase):
 
         # Create plugin_configuration
         plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref)
-
-        # Create plugin_configuration field
-        PluginConfigurationFieldFactory(configuration=plugin_configuration_ref)
 
         # Publish plugin_configuration
         logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
@@ -326,9 +314,6 @@ class APIReferenceLogicTestCase(TestCase):
         # Create plugin_configuration
         plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref)
 
-        # Create plugin_configuration field
-        plugin_configuration_field = PluginConfigurationFieldFactory(configuration=plugin_configuration_ref)
-
         # Publish plugin_configuration
         logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
 
@@ -336,20 +321,20 @@ class APIReferenceLogicTestCase(TestCase):
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['name'], plugin_configuration_ref.name)
-        self.assertEqual(result['value'][plugin_configuration_field.property], plugin_configuration_field.value)
+        self.assertEqual(result['value']['second'], plugin_configuration_ref.value['second'])
 
         # Update plugin_configuration
         new_value = 5
-        self.assertNotEqual(new_value, plugin_configuration_field.value)
-        plugin_configuration_field.value = new_value
-        plugin_configuration_field.save()
+        self.assertNotEqual(new_value, plugin_configuration_ref.value['second'])
+        plugin_configuration_ref.value['second'] = new_value
+        plugin_configuration_ref.save()
         logic.publish_plugin_configuration(self.client, plugin_configuration_ref)
 
         # Check
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['name'], plugin_configuration_ref.name)
-        self.assertEqual(result['value'][plugin_configuration_field.property], new_value)
+        self.assertEqual(result['value']['second'], plugin_configuration_ref.value['second'])
 
     def _cleanup_afterwards(self, api_ref):
         self._cleanup_api.append(api_ref)

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function
 import factory
 
-from kong_admin.models import APIReference, ConsumerReference, PluginConfigurationReference, PluginConfigurationField, \
+from kong_admin.models import APIReference, ConsumerReference, PluginConfigurationReference, \
     BasicAuthReference, KeyAuthReference, OAuth2Reference
 from kong_admin.enums import Plugins
 
@@ -22,15 +22,9 @@ class PluginConfigurationReferenceFactory(factory.DjangoModelFactory):
 
     api = factory.SubFactory(APIReferenceFactory)
     name = Plugins.ratelimiting.name
-
-
-class PluginConfigurationFieldFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = PluginConfigurationField
-
-    configuration = factory.SubFactory(PluginConfigurationReferenceFactory)
-    property = 'second'
-    value = 1
+    value = {
+        'second': 1
+    }
 
 
 class ConsumerReferenceFactory(factory.DjangoModelFactory):
@@ -62,5 +56,5 @@ class OAuth2ReferenceFactory(factory.DjangoModelFactory):
     name = factory.Sequence(lambda n: ('%s%s' % (fake.word(), n)).encode('utf-8'))
     redirect_uri = factory.Sequence(lambda n: fake.uri().encode('utf-8'))
 
-__all__ = [APIReferenceFactory, PluginConfigurationReferenceFactory, PluginConfigurationFieldFactory,
-           ConsumerReferenceFactory, BasicAuthReferenceFactory, KeyAuthReferenceFactory, OAuth2ReferenceFactory]
+__all__ = [APIReferenceFactory, PluginConfigurationReferenceFactory, ConsumerReferenceFactory,
+           BasicAuthReferenceFactory, KeyAuthReferenceFactory, OAuth2ReferenceFactory]

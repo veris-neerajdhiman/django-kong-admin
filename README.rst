@@ -10,7 +10,9 @@ django-kong-admin
     * - tests
       - | |circleci| |coveralls| |scrutinizer|
     * - package
-      - |version| |downloads|
+      - |version| |downloads| |wheel|
+    * - compatibility
+      - |pyversions| |implementation|
 
 .. |docs| image:: https://readthedocs.org/projects/django-kong-admin/badge/?style=flat
     :target: https://readthedocs.org/projects/django-kong-admin
@@ -35,5 +37,17 @@ django-kong-admin
 .. |scrutinizer| image:: https://img.shields.io/scrutinizer/g/vikingco/django-kong-admin/master.svg?style=flat
     :alt: Scrutinizer Status
     :target: https://scrutinizer-ci.com/g/vikingco/django-kong-admin/
+
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/django-kong-admin.svg?style=flat
+    :alt: Supported python versions
+    :target: https://pypi.python.org/pypi/django-kong-admin
+
+.. |implementation| image:: https://img.shields.io/pypi/implementation/django-kong-admin.svg?style=flat
+    :alt: Supported imlementations
+    :target: https://pypi.python.org/pypi/django-kong-admin
+
+.. |wheel| image:: https://img.shields.io/pypi/wheel/django-kong-admin.svg?style=flat
+    :alt: PyPI Wheel
+    :target: https://pypi.python.org/pypi/django-kong-admin
 
 A reusable Django App to manage a Kong service (https://getkong.org)

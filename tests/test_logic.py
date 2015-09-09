@@ -4,8 +4,10 @@ import uuid
 from django.test import TestCase
 
 from kong_admin import models
-from kong_admin.factory import get_kong_client
 from kong_admin import logic
+from kong_admin.factory import get_kong_client
+from kong_admin.enums import Plugins
+
 
 from .factories import APIReferenceFactory, PluginConfigurationReferenceFactory, ConsumerReferenceFactory, \
     BasicAuthReferenceFactory, KeyAuthReferenceFactory, OAuth2ReferenceFactory
@@ -27,7 +29,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_sync_incomplete_api(self):
         # Create incomplete api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url())
+        api_ref = APIReferenceFactory(upstream_url=fake.url())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -39,7 +41,7 @@ class APIReferenceLogicTestCase(TestCase):
         self.assertFalse(api_ref.synchronized)
 
         # Fix api_ref
-        api_ref.public_dns = fake.domain_name()
+        api_ref.inbound_dns = fake.domain_name()
         api_ref.save()
 
         # Sync again
@@ -49,12 +51,12 @@ class APIReferenceLogicTestCase(TestCase):
         # Check kong
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['target_url'], api_ref.target_url)
-        self.assertEqual(result['public_dns'], api_ref.public_dns)
+        self.assertEqual(result['upstream_url'], api_ref.upstream_url)
+        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
 
     def test_sync_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -66,12 +68,12 @@ class APIReferenceLogicTestCase(TestCase):
         # Check kong
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['target_url'], api_ref.target_url)
-        self.assertEqual(result['public_dns'], api_ref.public_dns)
+        self.assertEqual(result['upstream_url'], api_ref.upstream_url)
+        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
 
     def test_sync_updated_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -83,9 +85,9 @@ class APIReferenceLogicTestCase(TestCase):
         # Check kong
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['target_url'], api_ref.target_url)
-        self.assertEqual(result['public_dns'], api_ref.public_dns)
-        self.assertEqual(result['name'], api_ref.public_dns)
+        self.assertEqual(result['upstream_url'], api_ref.upstream_url)
+        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
+        self.assertEqual(result['name'], api_ref.inbound_dns)
 
         # Update
         new_name = fake.api_name()
@@ -100,13 +102,13 @@ class APIReferenceLogicTestCase(TestCase):
         # Check kong
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['target_url'], api_ref.target_url)
-        self.assertEqual(result['public_dns'], api_ref.public_dns)
+        self.assertEqual(result['upstream_url'], api_ref.upstream_url)
+        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
         self.assertEqual(result['name'], new_name)
 
     def test_withdraw_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Publish
         logic.synchronize_api(self.client, api_ref)
@@ -115,8 +117,8 @@ class APIReferenceLogicTestCase(TestCase):
         # Check kong
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['target_url'], api_ref.target_url)
-        self.assertEqual(result['public_dns'], api_ref.public_dns)
+        self.assertEqual(result['upstream_url'], api_ref.upstream_url)
+        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
 
         # Store kong_id
         kong_id = api_ref.kong_id
@@ -131,7 +133,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_delete_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Publish
         logic.synchronize_api(self.client, api_ref)
@@ -140,8 +142,8 @@ class APIReferenceLogicTestCase(TestCase):
         # Check kong
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['target_url'], api_ref.target_url)
-        self.assertEqual(result['public_dns'], api_ref.public_dns)
+        self.assertEqual(result['upstream_url'], api_ref.upstream_url)
+        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
 
         # You can delete afterwards
         api_kong_id = api_ref.kong_id
@@ -153,7 +155,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_sync_plugin_configuration_before_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -167,7 +169,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_sync_plugin_configuration_without_fields(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -178,10 +180,10 @@ class APIReferenceLogicTestCase(TestCase):
         # Check
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['target_url'], api_ref.target_url)
+        self.assertEqual(result['upstream_url'], api_ref.upstream_url)
 
         # Create plugin_configuration
-        plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref, value={})
+        plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref, config={})
 
         # Attempt to publish
         with self.assertRaises(ValueError):
@@ -189,7 +191,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_sync_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -200,7 +202,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Check
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['target_url'], api_ref.target_url)
+        self.assertEqual(result['upstream_url'], api_ref.upstream_url)
 
         # Create plugin_configuration
         plugin_configuration_ref = PluginConfigurationReferenceFactory(api=api_ref)
@@ -211,11 +213,11 @@ class APIReferenceLogicTestCase(TestCase):
         # Check
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['name'], plugin_configuration_ref.name)
+        self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
 
     def test_withdraw_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -232,7 +234,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Check
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['name'], plugin_configuration_ref.name)
+        self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
 
         # Withdraw plugin_configuration
         logic.withdraw_plugin_configuration(self.client, plugin_configuration_ref)
@@ -243,7 +245,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_delete_synchronized_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -260,7 +262,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Check
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['name'], plugin_configuration_ref.name)
+        self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
 
         # Delete plugin_configuration
         plugin_configuration_kong_id = plugin_configuration_ref.kong_id
@@ -272,7 +274,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_disable_synchronized_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -289,7 +291,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Check
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['name'], plugin_configuration_ref.name)
+        self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
         self.assertTrue(result['enabled'])
 
         # Update plugin_configuration
@@ -298,12 +300,12 @@ class APIReferenceLogicTestCase(TestCase):
         # Check
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['name'], plugin_configuration_ref.name)
+        self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
         self.assertFalse(result['enabled'])
 
     def test_update_synchronized_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(target_url=fake.url(), public_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -320,21 +322,21 @@ class APIReferenceLogicTestCase(TestCase):
         # Check
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['name'], plugin_configuration_ref.name)
-        self.assertEqual(result['value']['second'], plugin_configuration_ref.value['second'])
+        self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
+        self.assertEqual(result['config']['second'], plugin_configuration_ref.config['second'])
 
         # Update plugin_configuration
         new_value = 5
-        self.assertNotEqual(new_value, plugin_configuration_ref.value['second'])
-        plugin_configuration_ref.value['second'] = new_value
+        self.assertNotEqual(new_value, plugin_configuration_ref.config['second'])
+        plugin_configuration_ref.config['second'] = new_value
         plugin_configuration_ref.save()
         logic.publish_plugin_configuration(self.client, plugin_configuration_ref)
 
         # Check
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
-        self.assertEqual(result['name'], plugin_configuration_ref.name)
-        self.assertEqual(result['value']['second'], plugin_configuration_ref.value['second'])
+        self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
+        self.assertEqual(result['config']['second'], plugin_configuration_ref.config['second'])
 
     def _cleanup_afterwards(self, api_ref):
         self._cleanup_api.append(api_ref)

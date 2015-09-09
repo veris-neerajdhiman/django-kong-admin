@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, print_function
 from kong.exceptions import ConflictError
 from kong_admin.models import APIReference, PluginConfigurationReference
+from kong_admin.enums import Plugins
 
 from .base import KongProxySyncEngine
 
@@ -28,12 +29,12 @@ class APISyncEngine(KongProxySyncEngine):
     def on_publish(self, client, obj):
         try:
             api_struct = client.apis.add_or_update(
-                api_id=obj.kong_id, target_url=obj.target_url, name=obj.name, public_dns=obj.public_dns,
+                api_id=obj.kong_id, upstream_url=obj.upstream_url, name=obj.name, inbound_dns=obj.inbound_dns,
                 path=obj.path, strip_path=obj.strip_path)
         except ConflictError:
             api_struct = client.apis.update(
-                name_or_id=(obj.name or obj.public_dns), target_url=obj.target_url, name=obj.name,
-                public_dns=obj.public_dns, path=obj.path, strip_path=obj.strip_path)
+                name_or_id=(obj.name or obj.inbound_dns), upstream_url=obj.upstream_url, name=obj.name,
+                inbound_dns=obj.inbound_dns, path=obj.path, strip_path=obj.strip_path)
 
         name = api_struct['name']
 
@@ -81,17 +82,17 @@ class PluginConfigurationSyncEngine(KongProxySyncEngine):
 
         try:
             plugin_configuration_struct = client.apis.plugins(str(api_kong_id)).create_or_update(
-                plugin_configuration_id=obj.kong_id, plugin_name=obj.name, enabled=obj.enabled,
-                consumer_id=consumer_kong_id, **obj.value)
+                plugin_configuration_id=obj.kong_id, plugin_name=Plugins.label(obj.plugin), enabled=obj.enabled,
+                consumer_id=consumer_kong_id, **obj.config)
         except ConflictError:
             plugin_configuration_struct = client.apis.plugins(str(api_kong_id)).update(
-                plugin_name=obj.name, enabled=obj.enabled, consumer_id=consumer_kong_id, **obj.value)
+                plugin_id=obj.name, enabled=obj.enabled, consumer_id=consumer_kong_id, **obj.config)
 
-        value = plugin_configuration_struct['value']
+        config = plugin_configuration_struct['config']
 
-        if obj.value != value:
-            obj.value = value
-            self.get_proxy_class().objects.filter(id=obj.id).update(value=obj.value)
+        if obj.config != config:
+            obj.config = config
+            self.get_proxy_class().objects.filter(id=obj.id).update(config=obj.config)
 
         return plugin_configuration_struct['id']
 

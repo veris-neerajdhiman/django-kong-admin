@@ -126,14 +126,14 @@ def get_toggle_enable_caption(obj):
 class PluginConfigurationReferenceInline(admin.StackedInline):
     model = PluginConfigurationReference
     extra = 0
-    fields = ('name', 'value', 'enabled', 'consumer')
+    fields = ('name', 'config', 'enabled', 'consumer')
     formfield_overrides = {
         JSONField: {'widget': JSONWidget(mode='json', width='800px', height='180px', theme='twilight')},
     }
 
 
 class APIReferenceAdmin(CustomModelAdmin):
-    list_display = ('target_url', 'name', 'public_dns', 'path', 'enabled', 'synchronized', 'kong_id')
+    list_display = ('upstream_url', 'name', 'inbound_dns', 'path', 'enabled', 'synchronized', 'kong_id')
     list_display_buttons = [{
         'caption': 'Synchronize',
         'url': 'sync-api-ref/',
@@ -151,7 +151,7 @@ class APIReferenceAdmin(CustomModelAdmin):
     list_select_related = True
     fieldsets = (
         (None, {
-            'fields': ('target_url', 'name', 'public_dns', 'path', 'enabled')
+            'fields': ('upstream_url', 'name', 'inbound_dns', 'path', 'enabled')
         }),
         (_('Advanced options'), {
             'fields': ('strip_path',)

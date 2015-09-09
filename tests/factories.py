@@ -13,7 +13,7 @@ class APIReferenceFactory(factory.DjangoModelFactory):
     class Meta:
         model = APIReference
 
-    target_url = factory.Sequence(lambda n: fake.url().encode('utf-8'))
+    upstream_url = factory.Sequence(lambda n: fake.url().encode('utf-8'))
 
 
 class PluginConfigurationReferenceFactory(factory.DjangoModelFactory):
@@ -21,8 +21,8 @@ class PluginConfigurationReferenceFactory(factory.DjangoModelFactory):
         model = PluginConfigurationReference
 
     api = factory.SubFactory(APIReferenceFactory)
-    name = Plugins.ratelimiting.name
-    value = {
+    plugin = Plugins.RATE_LIMITING
+    config = {
         'second': 1
     }
 

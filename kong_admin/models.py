@@ -6,6 +6,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
+from django_enumfield import enum
 from jsonfield2 import JSONField, JSONAwareManager
 
 from kong.exceptions import ConflictError
@@ -28,9 +29,9 @@ class KongProxyModel(models.Model):
 
 @python_2_unicode_compatible
 class APIReference(KongProxyModel):
-    target_url = models.URLField()
+    upstream_url = models.URLField()
     name = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
-    public_dns = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
+    inbound_dns = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
     path = models.CharField(null=True, blank=True, max_length=32, default=None)
     strip_path = models.BooleanField(default=False)
     enabled = models.BooleanField(default=True)
@@ -40,15 +41,15 @@ class APIReference(KongProxyModel):
         verbose_name_plural = _('API References')
 
     def __str__(self):
-        return self.target_url if not self.name else '%s (%s)' % (self.name, self.target_url)
+        return self.upstream_url if not self.name else '%s (%s)' % (self.name, self.upstream_url)
 
     def clean(self):
         self.name = self.name or None  # Don't store empty strings
-        self.public_dns = self.public_dns or None  # Don't store empty strings
+        self.inbound_dns = self.inbound_dns or None  # Don't store empty strings
         self.path = self.path or None  # Don't store empty strings
 
-        if not self.public_dns and not self.path:
-            raise ValidationError('At least one of the parameters "public_dns" and "path" should be set')
+        if not self.inbound_dns and not self.path:
+            raise ValidationError('At least one of the parameters "inbound_dns" and "path" should be set')
 
         if self.synchronized_at and not self.kong_id:
             raise ValidationError('There should be an kong_id parameter')
@@ -61,16 +62,16 @@ class APIReference(KongProxyModel):
 class PluginConfigurationReference(KongProxyModel):
     api = models.ForeignKey(APIReference, related_name='plugins')
     consumer = models.ForeignKey('ConsumerReference', null=True, blank=True, related_name='plugins')
-    name = models.CharField(_('Plugin Name'), choices=Plugins.choices(), max_length=32)
+    plugin = enum.EnumField(Plugins, default=Plugins.REQUEST_SIZE_LIMITING)
     enabled = models.BooleanField(default=True)
-    value = JSONField(default={})
+    config = JSONField(default={})
 
-    objects = JSONAwareManager(json_fields=['value'])
+    objects = JSONAwareManager(json_fields=['config'])
 
     class Meta:
         verbose_name = _('Plugin Configuration Reference')
         verbose_name_plural = _('Plugin Configuration References')
-        unique_together = [('name', 'api')]
+        unique_together = [('plugin', 'api')]
 
     def __str__(self):
         return self.name

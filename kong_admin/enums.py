@@ -1,24 +1,35 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
-from enum import Enum, unique
+from django_enumfield import enum
 
 
-@unique
-class Plugins(Enum):
-    ssl = 0
-    keyauth = 1
-    basicauth = 2
-    oauth2 = 3
-    ratelimiting = 4
-    tcplog = 5
-    udplog = 6
-    filelog = 7
-    httplog = 8
-    cors = 9
-    request_transformer = 10
-    response_transformer = 11
-    requestsizelimiting = 12
+class Plugins(enum.Enum):
+    SSL = 1
+    KEY_AUTHENTICATION = 2
+    BASIC_AUTHENTICATION = 3
+    OAUTH2_AUTHENTICATION = 4
+    RATE_LIMITING = 5
+    TCP_LOG = 6
+    UDP_LOG = 7
+    FILE_LOG = 8
+    HTTP_LOG = 9
+    CORS = 10
+    REQUEST_TRANSFORMER = 11
+    REPONSE_TRANSFORMER = 12
+    REQUEST_SIZE_LIMITING = 13
 
-    @staticmethod
-    def choices():
-        return [(key, key) for key in sorted(Plugins.__members__.keys())]
+    labels = {
+        SSL: 'ssl',
+        KEY_AUTHENTICATION: 'key-authentication',
+        BASIC_AUTHENTICATION: 'basic-authentication',
+        OAUTH2_AUTHENTICATION: 'oauth2-authentication',
+        RATE_LIMITING: 'rate-limiting',
+        TCP_LOG: 'tcp-log',
+        UDP_LOG: 'udp-log',
+        FILE_LOG: 'file-log',
+        HTTP_LOG: 'http-log',
+        CORS: 'cors',
+        REQUEST_TRANSFORMER: 'request-transformer',
+        REPONSE_TRANSFORMER: 'response-transformer',
+        REQUEST_SIZE_LIMITING: 'request-size-limiting'
+    }

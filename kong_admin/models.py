@@ -74,7 +74,7 @@ class PluginConfigurationReference(KongProxyModel):
         unique_together = [('plugin', 'api')]
 
     def __str__(self):
-        return self.name
+        return Plugins.label(self.plugin)
 
 
 # @python_2_unicode_compatible

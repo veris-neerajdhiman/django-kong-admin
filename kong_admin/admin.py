@@ -126,7 +126,7 @@ def get_toggle_enable_caption(obj):
 class PluginConfigurationReferenceInline(admin.StackedInline):
     model = PluginConfigurationReference
     extra = 0
-    fields = ('name', 'config', 'enabled', 'consumer')
+    fields = ('plugin', 'config', 'enabled', 'consumer')
     formfield_overrides = {
         JSONField: {'widget': JSONWidget(mode='json', width='800px', height='180px', theme='twilight')},
     }

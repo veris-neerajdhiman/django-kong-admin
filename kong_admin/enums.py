@@ -17,13 +17,18 @@ class Plugins(enum.Enum):
     REQUEST_TRANSFORMER = 11
     REPONSE_TRANSFORMER = 12
     REQUEST_SIZE_LIMITING = 13
+    RESPONSE_RATE_LIMITING = 14
+    IP_RESTRICTION = 15
+    ACL = 16,
+
+    MASHAPE_ANALYTICS = 99
 
     labels = {
         SSL: 'ssl',
-        KEY_AUTHENTICATION: 'key-authentication',
-        BASIC_AUTHENTICATION: 'basic-authentication',
-        OAUTH2_AUTHENTICATION: 'oauth2-authentication',
-        RATE_LIMITING: 'rate-limiting',
+        KEY_AUTHENTICATION: 'key-auth',
+        BASIC_AUTHENTICATION: 'basic-auth',
+        OAUTH2_AUTHENTICATION: 'oauth2',
+        RATE_LIMITING: 'ratelimiting',
         TCP_LOG: 'tcp-log',
         UDP_LOG: 'udp-log',
         FILE_LOG: 'file-log',
@@ -31,5 +36,9 @@ class Plugins(enum.Enum):
         CORS: 'cors',
         REQUEST_TRANSFORMER: 'request-transformer',
         REPONSE_TRANSFORMER: 'response-transformer',
-        REQUEST_SIZE_LIMITING: 'request-size-limiting'
+        REQUEST_SIZE_LIMITING: 'request-size-limiting',
+        RESPONSE_RATE_LIMITING: 'response-ratelimiting',
+        IP_RESTRICTION: 'ip-restriction',
+        ACL: 'acl',
+        MASHAPE_ANALYTICS: 'mashape-analytics'
     }

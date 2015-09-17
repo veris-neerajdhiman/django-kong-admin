@@ -47,6 +47,15 @@ class APISyncEngine(KongProxySyncEngine):
     def on_withdraw_by_id(self, client, kong_id, parent_kong_id=None):
         client.apis.delete(str(kong_id))
 
+    def after_publish(self, client, obj):
+        self.plugins().synchronize(client, PluginConfigurationReference.objects.filter(api=obj), delete=True)
+        super(APISyncEngine, self).after_publish(client, obj)
+
+    def before_withdraw(self, client, obj):
+        for plugin in PluginConfigurationReference.objects.filter(api=obj):
+            self.plugins().withdraw(client, plugin)
+        return super(APISyncEngine, self).before_withdraw(client, obj)
+
 
 class PluginConfigurationSyncEngine(KongProxySyncEngine):
     def get_proxy_class(self):

@@ -19,7 +19,7 @@ class Plugins(enum.Enum):
     REQUEST_SIZE_LIMITING = 13
     RESPONSE_RATE_LIMITING = 14
     IP_RESTRICTION = 15
-    ACL = 16,
+    ACL = 16
 
     MASHAPE_ANALYTICS = 99
 

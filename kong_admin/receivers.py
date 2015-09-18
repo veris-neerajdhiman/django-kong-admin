@@ -62,6 +62,7 @@ def before_saving_oauth(sender, instance, **kwargs):
 @receiver(pre_save, sender=PluginConfigurationReference)
 def before_saving_plugin_configuration(sender, instance, **kwargs):
     instance.synchronized = False
+    APIReference.objects.filter(id=instance.api.id, synchronized=True).update(synchronized=False)
 
 
 @receiver(pre_delete, sender=PluginConfigurationReference)

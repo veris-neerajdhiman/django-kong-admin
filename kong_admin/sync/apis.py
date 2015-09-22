@@ -29,12 +29,12 @@ class APISyncEngine(KongProxySyncEngine):
     def on_publish(self, client, obj):
         try:
             api_struct = client.apis.add_or_update(
-                api_id=obj.kong_id, upstream_url=obj.upstream_url, name=obj.name, inbound_dns=obj.inbound_dns,
-                path=obj.path, strip_path=obj.strip_path)
+                api_id=obj.kong_id, upstream_url=obj.upstream_url, name=obj.name, request_host=obj.request_host,
+                request_path=obj.request_path)
         except ConflictError:
             api_struct = client.apis.update(
-                name_or_id=(obj.name or obj.inbound_dns), upstream_url=obj.upstream_url, name=obj.name,
-                inbound_dns=obj.inbound_dns, path=obj.path, strip_path=obj.strip_path)
+                name_or_id=(obj.name or obj.request_host), upstream_url=obj.upstream_url, name=obj.name,
+                request_host=obj.request_host, request_path=obj.request_path)
 
         name = api_struct['name']
 

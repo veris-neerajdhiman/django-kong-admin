@@ -29,7 +29,7 @@ class Plugins(enum.Enum):
         KEY_AUTHENTICATION: 'key-auth',
         BASIC_AUTHENTICATION: 'basic-auth',
         OAUTH2_AUTHENTICATION: 'oauth2',
-        RATE_LIMITING: 'ratelimiting',
+        RATE_LIMITING: 'rate-limiting',
         TCP_LOG: 'tcp-log',
         UDP_LOG: 'udp-log',
         FILE_LOG: 'file-log',

@@ -133,7 +133,7 @@ class PluginConfigurationReferenceInline(admin.StackedInline):
 
 
 class APIReferenceAdmin(CustomModelAdmin):
-    list_display = ('upstream_url', 'name', 'inbound_dns', 'path', 'enabled', 'synchronized', 'kong_id')
+    list_display = ('upstream_url', 'name', 'request_host', 'request_path', 'enabled', 'synchronized', 'kong_id')
     list_display_buttons = [{
         'caption': 'Synchronize',
         'url': 'sync-api-ref/',
@@ -151,7 +151,7 @@ class APIReferenceAdmin(CustomModelAdmin):
     list_select_related = True
     fieldsets = (
         (None, {
-            'fields': ('upstream_url', 'name', 'inbound_dns', 'path', 'enabled')
+            'fields': ('upstream_url', 'name', 'request_host', 'request_path', 'enabled')
         }),
         (_('Advanced options'), {
             'fields': ('strip_path',)

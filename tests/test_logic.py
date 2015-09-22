@@ -41,7 +41,7 @@ class APIReferenceLogicTestCase(TestCase):
         self.assertFalse(api_ref.synchronized)
 
         # Fix api_ref
-        api_ref.inbound_dns = fake.domain_name()
+        api_ref.request_host = fake.domain_name()
         api_ref.save()
 
         # Sync again
@@ -52,11 +52,11 @@ class APIReferenceLogicTestCase(TestCase):
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['upstream_url'], api_ref.upstream_url)
-        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
+        self.assertEqual(result['request_host'], api_ref.request_host)
 
     def test_sync_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -69,11 +69,11 @@ class APIReferenceLogicTestCase(TestCase):
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['upstream_url'], api_ref.upstream_url)
-        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
+        self.assertEqual(result['request_host'], api_ref.request_host)
 
     def test_sync_updated_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -86,8 +86,8 @@ class APIReferenceLogicTestCase(TestCase):
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['upstream_url'], api_ref.upstream_url)
-        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
-        self.assertEqual(result['name'], api_ref.inbound_dns)
+        self.assertEqual(result['request_host'], api_ref.request_host)
+        self.assertEqual(result['name'], api_ref.request_host)
 
         # Update
         new_name = fake.api_name()
@@ -103,12 +103,12 @@ class APIReferenceLogicTestCase(TestCase):
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['upstream_url'], api_ref.upstream_url)
-        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
+        self.assertEqual(result['request_host'], api_ref.request_host)
         self.assertEqual(result['name'], new_name)
 
     def test_withdraw_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Publish
         logic.synchronize_api(self.client, api_ref)
@@ -118,7 +118,7 @@ class APIReferenceLogicTestCase(TestCase):
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['upstream_url'], api_ref.upstream_url)
-        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
+        self.assertEqual(result['request_host'], api_ref.request_host)
 
         # Store kong_id
         kong_id = api_ref.kong_id
@@ -133,7 +133,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_delete_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Publish
         logic.synchronize_api(self.client, api_ref)
@@ -143,7 +143,7 @@ class APIReferenceLogicTestCase(TestCase):
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['upstream_url'], api_ref.upstream_url)
-        self.assertEqual(result['inbound_dns'], api_ref.inbound_dns)
+        self.assertEqual(result['request_host'], api_ref.request_host)
 
         # You can delete afterwards
         api_kong_id = api_ref.kong_id
@@ -155,7 +155,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_sync_plugin_configuration_before_api(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -169,7 +169,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_sync_plugin_configuration_without_fields(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -191,7 +191,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_sync_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -217,7 +217,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_withdraw_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -245,7 +245,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_delete_synchronized_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -274,7 +274,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_disable_synchronized_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -305,7 +305,7 @@ class APIReferenceLogicTestCase(TestCase):
 
     def test_update_synchronized_plugin_configuration(self):
         # Create api_ref
-        api_ref = APIReferenceFactory(upstream_url=fake.url(), inbound_dns=fake.domain_name())
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
 
         # Mark for auto cleanup
         self._cleanup_afterwards(api_ref)
@@ -504,7 +504,7 @@ class ConsumerReferenceLogicTestCase(TestCase):
         result = self.client.consumers.basic_auth(consumer_ref.kong_id).retrieve(auth_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['username'], auth_ref.username)
-        self.assertEqual(result['password'], auth_ref.password)
+        self.assertIsNotNone(result['password'])
 
     def test_sync_consumer_multiple_basic_auth(self):
         amount = 3
@@ -536,8 +536,8 @@ class ConsumerReferenceLogicTestCase(TestCase):
         result = self.client.consumers.basic_auth(consumer_ref.kong_id).list()
         self.assertIsNotNone(result)
         self.assertEqual(
-            sorted([(uuid.UUID(r['id']), r['username'], r['password']) for r in result['data']], key=lambda x: x[0]),
-            sorted([(obj.kong_id, obj.username, obj.password) for obj in auths], key=lambda x: x[0]))
+            sorted([(uuid.UUID(r['id']), r['username']) for r in result['data']], key=lambda x: x[0]),
+            sorted([(obj.kong_id, obj.username) for obj in auths], key=lambda x: x[0]))
 
     def test_withdraw_consumer_basic_auth(self):
         # Create consumer_ref

@@ -31,9 +31,8 @@ class KongProxyModel(models.Model):
 class APIReference(KongProxyModel):
     upstream_url = models.URLField()
     name = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
-    inbound_dns = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
-    path = models.CharField(null=True, blank=True, max_length=32, default=None)
-    strip_path = models.BooleanField(default=False)
+    request_host = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
+    request_path = models.CharField(null=True, blank=True, max_length=32, default=None)
     enabled = models.BooleanField(default=True)
 
     class Meta:
@@ -45,11 +44,11 @@ class APIReference(KongProxyModel):
 
     def clean(self):
         self.name = self.name or None  # Don't store empty strings
-        self.inbound_dns = self.inbound_dns or None  # Don't store empty strings
-        self.path = self.path or None  # Don't store empty strings
+        self.request_host = self.request_host or None  # Don't store empty strings
+        self.request_path = self.request_path or None  # Don't store empty strings
 
-        if not self.inbound_dns and not self.path:
-            raise ValidationError('At least one of the parameters "inbound_dns" and "path" should be set')
+        if not self.request_host and not self.request_path:
+            raise ValidationError('At least one of the parameters "request_host" and "request_path" should be set')
 
         if self.synchronized_at and not self.kong_id:
             raise ValidationError('There should be an kong_id parameter')

@@ -20,6 +20,7 @@ class Plugins(enum.Enum):
     RESPONSE_RATE_LIMITING = 14
     IP_RESTRICTION = 15
     ACL = 16
+    JWT = 17
 
     MASHAPE_ANALYTICS = 99
 
@@ -40,5 +41,6 @@ class Plugins(enum.Enum):
         RESPONSE_RATE_LIMITING: 'response-ratelimiting',
         IP_RESTRICTION: 'ip-restriction',
         ACL: 'acl',
+        JWT: 'jwt',
         MASHAPE_ANALYTICS: 'mashape-analytics'
     }

@@ -153,9 +153,6 @@ class APIReferenceAdmin(CustomModelAdmin):
         (None, {
             'fields': ('upstream_url', 'name', 'request_host', 'request_path', 'enabled')
         }),
-        (_('Advanced options'), {
-            'fields': ('strip_path',)
-        }),
         (_('Audit'), {
             'fields': ('created_at', 'updated_at')
         }),

@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 import json
-from django.conf import settings
-from django import forms
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http.response import HttpResponse
 
 from .factory import get_kong_client
 
 
+@login_required
 def show_config(request):
     """
     Debug view, this should not be used in production!
@@ -17,8 +18,8 @@ def show_config(request):
     :param request:
     :return:
     """
-    if not settings.DEBUG:
-        return HttpResponse(status=403)
+    if not request.user.is_staff:
+        return HttpResponse('Only staff is authorized to view the configuration', status=403)
 
     kong = get_kong_client()
 

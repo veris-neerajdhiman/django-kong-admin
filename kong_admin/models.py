@@ -33,6 +33,8 @@ class APIReference(KongProxyModel):
     name = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
     request_host = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
     request_path = models.CharField(null=True, blank=True, max_length=32, default=None)
+    preserve_host = models.BooleanField(default=False)
+    strip_request_path = models.BooleanField(default=False)
     enabled = models.BooleanField(default=True)
 
     class Meta:

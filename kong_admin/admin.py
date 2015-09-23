@@ -133,7 +133,8 @@ class PluginConfigurationReferenceInline(admin.StackedInline):
 
 
 class APIReferenceAdmin(CustomModelAdmin):
-    list_display = ('upstream_url', 'name', 'request_host', 'request_path', 'enabled', 'synchronized', 'kong_id')
+    list_display = ('upstream_url', 'name', 'request_host', 'preserve_host', 'request_path', 'strip_request_path',
+                    'enabled', 'synchronized', 'kong_id')
     list_display_buttons = [{
         'caption': 'Synchronize',
         'url': 'sync-api-ref/',
@@ -151,7 +152,13 @@ class APIReferenceAdmin(CustomModelAdmin):
     list_select_related = True
     fieldsets = (
         (None, {
-            'fields': ('upstream_url', 'name', 'request_host', 'request_path', 'enabled')
+            'fields': ('upstream_url', 'name', 'enabled')
+        }),
+        (_('Host'), {
+            'fields': ('request_host', 'preserve_host')
+        }),
+        (_('Path'), {
+            'fields': ('request_path', 'strip_request_path')
         }),
         (_('Audit'), {
             'fields': ('created_at', 'updated_at')
@@ -163,39 +170,6 @@ class APIReferenceAdmin(CustomModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
 
 admin.site.register(APIReference, APIReferenceAdmin)
-
-
-# class PluginConfigurationReferenceAdmin(CustomModelAdmin):
-#     list_display = ('name', 'api', 'enabled', 'synchronized', 'kong_id')
-#     list_display_buttons = [{
-#         'caption': 'Synchronize',
-#         'url': 'sync-plugin-configuration-ref/',
-#         'view': synchronize_plugin_configuration_reference
-#     }, {
-#         'caption': get_toggle_enable_caption,
-#         'url': 'toggle-enable/',
-#         'view': lambda request, pk: synchronize_plugin_configuration_reference(request, pk, toggle_enable=True)
-#     }]
-#     action_buttons = [{
-#         'caption': 'Synchronize all',
-#         'url': 'sync-plugin-configuration-refs/',
-#         'view': synchronize_plugin_configuration_references
-#     }]
-#     list_select_related = True
-#     fieldsets = (
-#         (None, {
-#             'fields': ('name', 'enabled', 'value')
-#         }),
-#         (_('Target'), {
-#             'fields': ('api', 'consumer')
-#         }),
-#         (_('Audit'), {
-#             'fields': ('created_at', 'updated_at')
-#         }),
-#     )
-#     readonly_fields = ('created_at', 'updated_at')
-#
-# admin.site.register(PluginConfigurationReference, PluginConfigurationReferenceAdmin)
 
 
 class BasicAuthInline(admin.StackedInline):
@@ -252,22 +226,3 @@ class ConsumerReferenceAdmin(CustomModelAdmin):
         return obj.username or obj.custom_id
 
 admin.site.register(ConsumerReference, ConsumerReferenceAdmin)
-
-
-# class OAuth2ApplicationAdmin(CustomModelAdmin):
-#     list_display = ('name','redirect_uri', 'client_id', 'client_secret')
-#     fieldsets = (
-#         (None, {
-#             'fields': ('name', 'redirect_uri')
-#         }),
-#         (_('Consumers'), {
-#             'fields': ('consumers',)
-#         }),
-#         (_('Credentials'), {
-#             'fields': ('client_id', 'client_secret')
-#         }),
-#     )
-#     raw_id_fields = ('consumers',)
-#     readonly_fields = ('created_at', 'updated_at')
-#
-# admin.site.register(OAuth2Application, OAuth2ApplicationAdmin)

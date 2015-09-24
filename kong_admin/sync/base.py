@@ -208,10 +208,6 @@ class KongProxySyncEngine(with_metaclass(ABCMeta, object)):
         :type delete: bool
         :return:
         """
-
-        # Make sure we have a queryset
-        queryset = queryset or self.get_proxy_class().objects.all()
-
         # Delete remote api's that do not exist in this database
         if delete:
             for kong_struct in self.on_retrieve_all(client):
@@ -220,9 +216,12 @@ class KongProxySyncEngine(with_metaclass(ABCMeta, object)):
 
                 parent_kong_id = kong_struct.get(self.get_parent_key(), None)
 
-                if not queryset.filter(kong_id=kong_id).exists():
+                if not self.get_proxy_class().objects.all().filter(kong_id=kong_id).exists():
                     logger.debug('synchronize: delete %s by id: %s' % (self.get_proxy_class(), kong_id))
                     self.withdraw_by_id(client, kong_id, parent_kong_id=parent_kong_id)
+
+        # Make sure we have a queryset
+        queryset = queryset or self.get_proxy_class().objects.all()
 
         # Add remote apis that only exist in this database
         for obj in queryset:

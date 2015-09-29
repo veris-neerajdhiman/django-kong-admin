@@ -42,7 +42,8 @@ class APIReference(KongProxyModel):
         verbose_name_plural = _('API References')
 
     def __str__(self):
-        return self.upstream_url if not self.name else '%s (%s)' % (self.name, self.upstream_url)
+        result = self.upstream_url if not self.name else '%s (%s)' % (self.name, self.upstream_url)
+        return str(result)
 
     def clean(self):
         self.name = self.name or None  # Don't store empty strings
@@ -75,21 +76,7 @@ class PluginConfigurationReference(KongProxyModel):
         unique_together = [('plugin', 'api')]
 
     def __str__(self):
-        return Plugins.label(self.plugin)
-
-
-# @python_2_unicode_compatible
-# class PluginConfigurationField(models.Model):
-#     configuration = models.ForeignKey(PluginConfigurationReference, related_name='fields')
-#     property = models.CharField(max_length=32)
-#     value = models.CharField(max_length=32)
-#
-#     class Meta:
-#         verbose_name = _('Plugin Configuration Field')
-#         verbose_name_plural = _('Plugin Configuration Fields')
-#
-#     def __str__(self):
-#         return '%s = %s' % (self.property, self.value)
+        return str(Plugins.label(self.plugin))
 
 
 @python_2_unicode_compatible

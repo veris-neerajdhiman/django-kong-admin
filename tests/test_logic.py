@@ -12,6 +12,7 @@ from kong_admin.enums import Plugins
 from .factories import APIReferenceFactory, PluginConfigurationReferenceFactory, ConsumerReferenceFactory, \
     BasicAuthReferenceFactory, KeyAuthReferenceFactory, OAuth2ReferenceFactory
 from .fake import fake
+from kong_admin.models import PluginConfigurationReference
 
 
 class APIReferenceLogicTestCase(TestCase):
@@ -844,3 +845,100 @@ class ConsumerReferenceLogicTestCase(TestCase):
     def _cleanup_afterwards(self, consumer_ref):
         self._cleanup_consumers.append(consumer_ref)
         return consumer_ref
+
+
+class AuthenticationPluginTestCase(TestCase):
+    def setUp(self):
+        self.client = get_kong_client()
+        self._cleanup_api = []
+
+    def tearDown(self):
+        self.client.close()
+
+        for api_ref in self._cleanup_api:
+            self.assertTrue(isinstance(api_ref, models.APIReference))
+            api_ref = models.APIReference.objects.get(id=api_ref.id)  # reloads!!
+            logic.withdraw_api(self.client, api_ref)
+
+    def test_create_oauth2_plugin(self):
+        # Create api_ref
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
+
+        # Create plugin_configuration_ref
+        plugin_configuration_ref = PluginConfigurationReferenceFactory(
+            api=api_ref, plugin=Plugins.OAUTH2_AUTHENTICATION, config={})
+
+        # Mark for auto cleanup
+        self._cleanup_afterwards(api_ref)
+
+        # Publish api
+        logic.synchronize_api(self.client, api_ref)
+
+        # Reload plugin configuration
+        plugin_configuration_ref = PluginConfigurationReference.objects.get(id=plugin_configuration_ref.id)
+
+        # Check
+        result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
+        self.assertIsNotNone(result)
+        self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
+
+    def test_create_oauth2_plugin_with_scopes(self):
+        # Create api_ref
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
+
+        # Create plugin_configuration_ref
+        plugin_configuration_ref = PluginConfigurationReferenceFactory(
+            api=api_ref, plugin=Plugins.OAUTH2_AUTHENTICATION, config={
+                'scopes': 'email,subscriptions,topups'
+            })
+
+        # Mark for auto cleanup
+        self._cleanup_afterwards(api_ref)
+
+        # Publish api
+        logic.synchronize_api(self.client, api_ref)
+
+        # Reload plugin configuration
+        plugin_configuration_ref = PluginConfigurationReference.objects.get(id=plugin_configuration_ref.id)
+
+        # Check
+        result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
+        self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
+        self.assertEqual(result['config']['scopes'], ['email', 'subscriptions', 'topups'])
+
+    def test_update_oauth2_plugin_with_scopes(self):
+        # Create api_ref
+        api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
+
+        # Create plugin_configuration_ref
+        plugin_configuration_ref = PluginConfigurationReferenceFactory(
+            api=api_ref, plugin=Plugins.OAUTH2_AUTHENTICATION, config={})
+
+        # Mark for auto cleanup
+        self._cleanup_afterwards(api_ref)
+
+        # Publish api
+        logic.synchronize_api(self.client, api_ref)
+
+        # Reload plugin configuration
+        plugin_configuration_ref = PluginConfigurationReference.objects.get(id=plugin_configuration_ref.id)
+
+        # Update plugin_configuration_ref
+        plugin_configuration_ref.config = dict({
+            'scopes': 'email,subscriptions,topups'
+        }, **plugin_configuration_ref.config)
+        plugin_configuration_ref.save()
+
+        # Publish api
+        logic.synchronize_api(self.client, api_ref)
+
+        # Reload plugin configuration
+        plugin_configuration_ref = PluginConfigurationReference.objects.get(id=plugin_configuration_ref.id)
+
+        # Check
+        result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
+        self.assertEqual(result['config']['scopes'], ['email', 'subscriptions', 'topups'])
+
+    def _cleanup_afterwards(self, api_ref):
+        self._cleanup_api.append(api_ref)
+        return api_ref

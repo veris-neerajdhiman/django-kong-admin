@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 import logging
-from six import python_2_unicode_compatible
 
+from six import python_2_unicode_compatible
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
-
 from django_enumfield import enum
 from jsonfield2 import JSONField, JSONAwareManager
 
-from kong.exceptions import ConflictError
 from .enums import Plugins
+from .validators import name_validator
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +29,8 @@ class KongProxyModel(models.Model):
 @python_2_unicode_compatible
 class APIReference(KongProxyModel):
     upstream_url = models.URLField()
-    name = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
+    name = models.CharField(
+        null=True, blank=True, unique=True, max_length=32, default=None, validators=[name_validator])
     request_host = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
     request_path = models.CharField(null=True, blank=True, max_length=32, default=None)
     preserve_host = models.BooleanField(default=False)

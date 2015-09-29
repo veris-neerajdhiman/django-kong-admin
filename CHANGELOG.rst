@@ -3,6 +3,11 @@
 Changelog
 =========
 
+0.3.5 (2015-09-29)
+------------------
+
+* Implemented validator for APIReference name field
+
 0.3.4 (2015-09-24)
 ------------------
 

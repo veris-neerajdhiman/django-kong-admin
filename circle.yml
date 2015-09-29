@@ -28,7 +28,7 @@ dependencies:
             docker run -d
             -p 9042:9042
             --name cassandra
-            mashape/cassandra; sleep 5
+            mashape/cassandra; sleep 10
         - >
             docker run -d
             -p 8000:8000

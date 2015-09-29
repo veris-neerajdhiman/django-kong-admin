@@ -1,0 +1,18 @@
+include *.py
+include *.rst
+include *.txt
+include *.yml
+include .bumpversion.cfg
+include .coveragerc
+include LICENSE
+include MANIFEST
+include Makefile
+include tox.ini
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs *.txt
+recursive-include docs Makefile
+recursive-include kong_admin *.html
+recursive-include kong_admin *.py
+recursive-include tests *.py

@@ -28,13 +28,24 @@ class KongProxyModel(models.Model):
 
 @python_2_unicode_compatible
 class APIReference(KongProxyModel):
-    upstream_url = models.URLField()
+    upstream_url = models.URLField(help_text=_(
+        'The base target URL that points to your API server, this URL will be used for proxying requests. For example, '
+        'https://mockbin.com.'))
     name = models.CharField(
-        null=True, blank=True, unique=True, max_length=32, default=None, validators=[name_validator])
-    request_host = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None)
-    request_path = models.CharField(null=True, blank=True, max_length=32, default=None)
-    preserve_host = models.BooleanField(default=False)
-    strip_request_path = models.BooleanField(default=False)
+        null=True, blank=True, unique=True, max_length=32, default=None, validators=[name_validator], help_text=_(
+            'The API name. If none is specified, will default to the request_host or request_path.'))
+    request_host = models.CharField(null=True, blank=True, unique=True, max_length=32, default=None, help_text=_(
+        'The public DNS address that points to your API. For example, mockbin.com. At least request_host or '
+        'request_path or both should be specified.'))
+    request_path = models.CharField(null=True, blank=True, max_length=32, default=None, help_text=_(
+        'The public path that points to your API. For example, /someservice. At least request_host or request_path or '
+        'both should be specified.'))
+    preserve_host = models.BooleanField(default=False, help_text=_(
+        'Preserves the original Host header sent by the client, instead of replacing it with the hostname of the '
+        'upstream_url. By default is false.'))
+    strip_request_path = models.BooleanField(default=False, help_text=_(
+        'Strip the request_path value before proxying the request to the final API. For example a request made to '
+        '/someservice/hello will be resolved to upstream_url/hello. By default is false.'))
     enabled = models.BooleanField(default=True)
 
     class Meta:
@@ -62,11 +73,17 @@ class APIReference(KongProxyModel):
 
 @python_2_unicode_compatible
 class PluginConfigurationReference(KongProxyModel):
-    api = models.ForeignKey(APIReference, related_name='plugins')
-    consumer = models.ForeignKey('ConsumerReference', null=True, blank=True, related_name='plugins')
-    plugin = enum.EnumField(Plugins, default=Plugins.REQUEST_SIZE_LIMITING)
+    api = models.ForeignKey(APIReference, related_name='plugins', help_text=_(
+        'The API on which to add a plugin configuration'))
+    consumer = models.ForeignKey('ConsumerReference', null=True, blank=True, related_name='plugins', help_text=_(
+        'The consumer that overrides the existing settings for this specific consumer on incoming requests.'))
+    plugin = enum.EnumField(Plugins, default=Plugins.REQUEST_SIZE_LIMITING, help_text=_(
+        'The name of the Plugin that\'s going to be added. Currently the Plugin must be installed in every Kong '
+        'instance separately.'))
     enabled = models.BooleanField(default=True)
-    config = JSONField(default={})
+    config = JSONField(default={}, help_text=_(
+        'The configuration properties for the Plugin which can be found on the plugins documentation page in the '
+        'Plugin Gallery.'))
 
     objects = JSONAwareManager(json_fields=['config'])
 
@@ -81,8 +98,11 @@ class PluginConfigurationReference(KongProxyModel):
 
 @python_2_unicode_compatible
 class ConsumerReference(KongProxyModel):
-    username = models.CharField(null=True, blank=True, unique=True, max_length=32)
-    custom_id = models.CharField(null=True, blank=True, unique=True, max_length=48)
+    username = models.CharField(null=True, blank=True, unique=True, max_length=32, help_text=_(
+        'The username of the consumer. You must send either this field or custom_id with the request.'))
+    custom_id = models.CharField(null=True, blank=True, unique=True, max_length=48, help_text=_(
+        'Field for storing an existing ID for the consumer, useful for mapping Kong with users in your existing '
+        'database. You must send either this field or username with the request.'))
     enabled = models.BooleanField(default=True)
 
     class Meta:
@@ -109,8 +129,9 @@ class ConsumerAuthentication(KongProxyModel):
 
 @python_2_unicode_compatible
 class BasicAuthReference(ConsumerAuthentication):
-    username = models.CharField(unique=True, max_length=32)
-    password = models.CharField(max_length=40)
+    username = models.CharField(unique=True, max_length=32, help_text=_(
+        'The username to use in the Basic Authentication'))
+    password = models.CharField(max_length=40, help_text=_('The password to use in the Basic Authentication'))
 
     class Meta:
         verbose_name = _('Basic Auth Reference')
@@ -122,7 +143,9 @@ class BasicAuthReference(ConsumerAuthentication):
 
 @python_2_unicode_compatible
 class KeyAuthReference(ConsumerAuthentication):
-    key = models.TextField()
+    key = models.TextField(help_text=_(
+        'You can optionally set your own unique key to authenticate the client. If missing, the plugin will generate '
+        'one.'))
 
     class Meta:
         verbose_name = _('Key Auth Reference')
@@ -137,10 +160,14 @@ class KeyAuthReference(ConsumerAuthentication):
 
 @python_2_unicode_compatible
 class OAuth2Reference(ConsumerAuthentication):
-    name = models.CharField(unique=True, max_length=32)
-    redirect_uri = models.URLField()
-    client_id = models.CharField(null=True, blank=True, unique=True, max_length=64)
-    client_secret = models.TextField(null=True, blank=True)
+    name = models.CharField(unique=True, max_length=32, help_text=_(
+        'The name to associate to the credential. In OAuth 2.0 this would be the application name.'))
+    redirect_uri = models.URLField(help_text=_(
+        'The URL in your app where users will be sent after authorization (RFC 6742 Section 3.1.2)'))
+    client_id = models.CharField(null=True, blank=True, unique=True, max_length=64, help_text=_(
+        'You can optionally set your own unique client_id. If missing, the plugin will generate one.'))
+    client_secret = models.TextField(null=True, blank=True, help_text=_(
+        'You can optionally set your own unique client_secret. If missing, the plugin will generate one.'))
 
     class Meta:
         verbose_name = _('OAuth2 Reference')

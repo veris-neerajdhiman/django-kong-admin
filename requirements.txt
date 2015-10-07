@@ -4,6 +4,6 @@ django-jsonfield2==15.06.08
 django-enumfield==1.2.1
 django-ace==1.0.2
 wheel==0.24.0
-python-kong>=0.3.1
+python-kong>=0.3.2
 pytz>=2015.4
 enum34>=1.0.4

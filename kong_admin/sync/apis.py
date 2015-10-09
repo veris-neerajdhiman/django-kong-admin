@@ -28,7 +28,7 @@ class APISyncEngine(KongProxySyncEngine):
 
     def on_publish(self, client, obj):
         try:
-            api_struct = client.apis.add_or_update(
+            api_struct = client.apis.create_or_update(
                 api_id=obj.kong_id, upstream_url=obj.upstream_url, name=obj.name, request_host=obj.request_host,
                 request_path=obj.request_path, strip_request_path=obj.strip_request_path,
                 preserve_host=obj.preserve_host)

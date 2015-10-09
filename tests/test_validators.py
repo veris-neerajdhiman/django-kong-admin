@@ -11,7 +11,7 @@ class ValidatorTestCase(TestCase):
         name_validator('Test')
 
     def test_name_validator_only_numbers(self):
-        name_validator('123')
+        name_validator('123āæ')
 
     def test_name_validator_letters_and_numbers(self):
         name_validator('Test123')
@@ -23,7 +23,7 @@ class ValidatorTestCase(TestCase):
             name_validator('Test%s123' % character)
 
     def test_name_validator_include_illegal_characters(self):
-        illegal_characters = ' !@#$%^&*()+={}[]\\|"\'?/<>,āæ'  # Added some illegal unicode chars
+        illegal_characters = ' !@#$%^&*()+={}[]\\|"\'?/<>'
 
         for character in illegal_characters:
             with self.assertRaises(ValidationError):

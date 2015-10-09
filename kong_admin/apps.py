@@ -8,4 +8,5 @@ class KongAdminConfig(AppConfig):
     verbose_name = 'Kong'
 
     def ready(self):
+        # WTF: What is the purpose of this? Shouldn't this deserve a bit of explanation?
         from kong_admin.receivers import __all__

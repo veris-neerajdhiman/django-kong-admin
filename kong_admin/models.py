@@ -54,7 +54,7 @@ class APIReference(KongProxyModel):
 
     def __str__(self):
         result = self.upstream_url if not self.name else '%s (%s)' % (self.name, self.upstream_url)
-        return str(result)
+        return str(result)  # WTF: Use six.text_type, and do it in one line.
 
     def clean(self):
         self.name = self.name or None  # Don't store empty strings
@@ -93,7 +93,7 @@ class PluginConfigurationReference(KongProxyModel):
         unique_together = [('plugin', 'api')]
 
     def __str__(self):
-        return str(Plugins.label(self.plugin))
+        return str(Plugins.label(self.plugin))  # WTF: Use six.text_type
 
 
 @python_2_unicode_compatible
@@ -177,5 +177,7 @@ class OAuth2Reference(ConsumerAuthentication):
         return 'OAuth2Reference(name: %s)' % self.name
 
     def clean(self):
+        # WTF: This violates a lot of Django assumptions. Are you sure it's not better to do this conversion only when
+        # accessing the data?
         self.client_id = self.client_id or None  # Don't store empty strings
         self.client_secret = self.client_secret or None  # Don't store empty strings

@@ -11,6 +11,11 @@ from abc import ABCMeta, abstractmethod
 logger = logging.getLogger(__name__)
 
 
+# WTF: some documentation seems incomplete. Especially the not implemented functions should contain some docs
+# about how and when they are being called. This makes it easier to make a third use case, without resorting to
+# the existing examples and possibly making the wrong assumptions.
+
+
 class KongProxySyncEngine(with_metaclass(ABCMeta, object)):
     @abstractmethod
     def get_proxy_class(self):
@@ -31,7 +36,7 @@ class KongProxySyncEngine(with_metaclass(ABCMeta, object)):
     @abstractmethod
     def is_published(self, client, kong_id, parent_kong_id=None):
         """
-        Caleld to check whether an object is known at kong
+        Caleld to check whether an object is known at kong  # WTF: typo? :-)
 
         :param client:
         :param kong_id:

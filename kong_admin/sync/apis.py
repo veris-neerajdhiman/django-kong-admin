@@ -111,4 +111,6 @@ class PluginConfigurationSyncEngine(KongProxySyncEngine):
         assert kong_id is not None
         assert parent_kong_id is not None
 
+        # WTF: Why making it an optional kwarg while asserting that it is not None?
+
         client.apis.plugins(parent_kong_id).delete(kong_id)

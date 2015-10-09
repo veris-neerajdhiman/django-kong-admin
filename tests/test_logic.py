@@ -15,6 +15,9 @@ from .fake import fake
 from kong_admin.models import PluginConfigurationReference
 
 
+# WTF: Again, I smell some code duplication. No way to generalize stuff?
+
+
 class APIReferenceLogicTestCase(TestCase):
     def setUp(self):
         self.client = get_kong_client()
@@ -178,7 +181,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Publish api
         logic.synchronize_api(self.client, api_ref)
 
-        # Check
+        # Check # WTF: check what? see below as well...
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['upstream_url'], api_ref.upstream_url)
@@ -189,6 +192,8 @@ class APIReferenceLogicTestCase(TestCase):
         # Attempt to publish
         with self.assertRaises(ValueError):
             logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
+
+        # WTF: no checking of the result of the publish call?
 
     def test_sync_plugin_configuration(self):
         # Create api_ref

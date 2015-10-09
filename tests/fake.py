@@ -8,6 +8,8 @@ fake = Factory.create()
 
 
 # Create a provider for API Names (TODO: This is taken copy-paste from python-kong. Fix duplication!)
+# WTF: This is so small and prone to changes with respect to python-kong that I find it okay to copy it here. You
+# can see this more as configuration.
 class APIInfoProvider(BaseProvider):
     def api_name(self):
         return fake.name().replace(' ', '')
@@ -21,7 +23,8 @@ class APIInfoProvider(BaseProvider):
 
 class ConsumerInfoProvider(BaseProvider):
     def consumer_name(self):
-        return fake.lexify('??????')
+        t = fake.lexify('??????ėčń')  # Add unicode bomb, congrats, your code survives it. Keep the bomb :-)
+        return t
 
 fake.add_provider(APIInfoProvider)
 fake.add_provider(ConsumerInfoProvider)

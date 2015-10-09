@@ -12,7 +12,7 @@ from .factory import get_kong_client
 @login_required
 def show_config(request):
     """
-    Debug view, this should not be used in production!
+    Debug view, this should not be used in production!  # WTF: Why not? It would be very handy for ops (issue solving)
     This view shows the configuration as it is known by Kong
 
     :param request:
@@ -36,5 +36,5 @@ def show_config(request):
         result['consumers'][i]['keyauth'] = list(kong.consumers.key_auth(result['consumers'][i]['id']).iterate()),
         result['consumers'][i]['oauth2'] = list(kong.consumers.oauth2(result['consumers'][i]['id']).iterate()),
 
-    config = json.dumps(result, sort_keys=True, indent=4, separators=(',', ': '))
+    config = json.dumps(result, sort_keys=True, indent=4, separators=(',', ': '))  # WTF: why not a space after the ','?
     return render(request, 'kong_admin/show_config.html', {'config': config})

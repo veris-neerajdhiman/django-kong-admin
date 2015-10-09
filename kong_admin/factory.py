@@ -15,6 +15,8 @@ def get_consumer_sync_engine():
 
 
 def get_kong_client():
+    # WTF: Why the inline imports? Having evil circular dependencies?
+    # WTF: Please document if they are absolutely necessary.
     from kong.client import KongAdminClient
     from kong.simulator import KongAdminSimulator
 

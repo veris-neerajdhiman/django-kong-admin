@@ -8,5 +8,5 @@ from django_ace.widgets import AceWidget
 class JSONWidget(AceWidget):
     def render(self, name, value, attrs=None):
         if not isinstance(value, six.string_types):
-            value = json.dumps(value, sort_keys=True, indent=4, separators=(',', ': '))
+            value = json.dumps(value, sort_keys=True, indent=4, separators=(',', ': '))  # WTF: why no space after ','?
         return super(JSONWidget, self).render(name, value, attrs)

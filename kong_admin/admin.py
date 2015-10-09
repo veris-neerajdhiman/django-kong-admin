@@ -17,6 +17,10 @@ from .contrib import CustomModelAdmin
 from .widgets import JSONWidget
 
 
+# WTF: I can't help it, but this smells a lot like code duplication. Why not making some with-statement which
+# takes the error messages. Also, please avoid "str". Use six.text_type, especially when using unicode_literals.
+
+
 @staff_member_required
 def synchronize_api_references(request, queryset=None):
     try:

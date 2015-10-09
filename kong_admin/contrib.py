@@ -6,6 +6,7 @@ from django.contrib.admin import ModelAdmin
 from django.utils.safestring import mark_safe
 
 
+# WTF: I find "customWhatever" a vague name for an extension. Why not explicitly give it a name like ButtonsModelAdmin?
 class CustomModelAdmin(ModelAdmin):
     change_list_template = 'kong_admin/custom_admin_change_list.html'
 
@@ -17,7 +18,8 @@ class CustomModelAdmin(ModelAdmin):
     def get_urls(self):
         urls = super(CustomModelAdmin, self).get_urls()
         action_buttons = getattr(self, 'action_buttons', [])
-        list_display_buttons = getattr(self, 'list_display_buttons', [])
+        list_display_buttons = getattr(self, 'list_display_buttons', [])  # WTF: maybe a private property is cleaner
+                                                                          # than all those getattr calls.
 
         custom_urls = []
 
@@ -58,6 +60,8 @@ class CustomModelAdmin(ModelAdmin):
         # Return rendered button
         return mark_safe('<a href="%(url)s"><input type="button" value="%(caption)s" /></a>' % button)
 
+    # WTF: If you enforce a slash at the end on the 'url' field of the button, you can leave this function away,
+    # resulting in less moving parts.
     @staticmethod
     def _safe_list_display_button_url(button_url):
         if not button_url.endswith('/'):

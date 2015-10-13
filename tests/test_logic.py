@@ -15,9 +15,6 @@ from .fake import fake
 from kong_admin.models import PluginConfigurationReference
 
 
-# WTF: Again, I smell some code duplication. No way to generalize stuff?
-
-
 class APIReferenceLogicTestCase(TestCase):
     def setUp(self):
         self.client = get_kong_client()

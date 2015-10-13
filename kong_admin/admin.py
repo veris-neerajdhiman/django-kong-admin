@@ -9,7 +9,7 @@ from .models import APIReference, PluginConfigurationReference, ConsumerReferenc
     BasicAuthReference, KeyAuthReference, OAuth2Reference
 from .views import synchronize_api_reference, synchronize_api_references, synchronize_consumer_reference, \
     synchronize_consumer_references
-from .contrib import CustomModelAdmin
+from .contrib import ActionButtonModelAdmin
 from .widgets import JSONWidget
 
 
@@ -26,7 +26,7 @@ class PluginConfigurationReferenceInline(admin.StackedInline):
     }
 
 
-class APIReferenceAdmin(CustomModelAdmin):
+class APIReferenceAdmin(ActionButtonModelAdmin):
     list_display = ('upstream_url', 'name', 'request_host', 'preserve_host', 'request_path', 'strip_request_path',
                     'enabled', 'synchronized', 'kong_id')
     list_display_buttons = [{
@@ -84,7 +84,7 @@ class OAuthInline(admin.StackedInline):
     fields = ('name', 'redirect_uri', 'client_id', 'client_secret')
 
 
-class ConsumerReferenceAdmin(CustomModelAdmin):
+class ConsumerReferenceAdmin(ActionButtonModelAdmin):
     list_display = ('username_or_custom_id', 'enabled', 'synchronized', 'kong_id')
     list_display_buttons = [{
         'caption': 'Synchronize',

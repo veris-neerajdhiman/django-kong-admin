@@ -69,8 +69,3 @@ def before_saving_plugin_configuration(sender, instance, **kwargs):
 def before_delete_plugin_configuration(sender, instance, **kwargs):
     with closing(get_kong_client()) as client:
         get_api_sync_engine().plugins().withdraw(client, instance)
-
-# WTF: What is the purpose of this? Add some docs.
-__all__ = [before_saving_api, before_delete_api, before_saving_consumer, before_delete_consumer,
-           before_saving_basic_auth, before_saving_key_auth, before_saving_oauth, before_saving_plugin_configuration,
-           before_delete_plugin_configuration]

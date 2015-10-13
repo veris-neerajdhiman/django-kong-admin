@@ -3,6 +3,12 @@
 Changelog
 =========
 
+0.4.0 (2015-10-13)
+------------------
+
+* Updated Kong integration library (WARNING: Not backwards compatible!)
+* Code cleanup
+
 0.3.9 (2015-10-07)
 ------------------
 

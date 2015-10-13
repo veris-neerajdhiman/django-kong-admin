@@ -2,6 +2,9 @@
 from __future__ import unicode_literals, print_function
 from django.conf import settings
 
+from kong.client import KongAdminClient
+from kong.simulator import KongAdminSimulator
+
 from .sync.apis import APISyncEngine
 from .sync.consumers import ConsumerSyncEngine
 
@@ -15,11 +18,6 @@ def get_consumer_sync_engine():
 
 
 def get_kong_client():
-    # WTF: Why the inline imports? Having evil circular dependencies?
-    # WTF: Please document if they are absolutely necessary.
-    from kong.client import KongAdminClient
-    from kong.simulator import KongAdminSimulator
-
     api_url = getattr(settings, 'KONG_ADMIN_URL')
     simulator_enabled = getattr(settings, 'KONG_ADMIN_SIMULATOR')
 

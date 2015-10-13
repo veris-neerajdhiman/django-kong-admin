@@ -28,12 +28,12 @@ class ActionButtonModelAdmin(ModelAdmin):
         custom_urls = []
 
         for button in action_buttons:
-            custom_urls.append(url(r"^%s$" % button['url'], button['view']))
+            custom_urls.append(url(r'^%s$' % button['url'], button['view']))
 
         for button in list_display_buttons:
             # Add pk attribute regex that will always be provided
             button_url = ActionButtonModelAdmin._safe_list_display_button_url(button['url']) + r'(?P<pk>\d+)/'
-            custom_urls.append(url(r"^%s$" % button_url, button['view']))
+            custom_urls.append(url(r'^%s$' % button_url, button['view']))
 
         my_urls = patterns("", *custom_urls)
         return my_urls + urls

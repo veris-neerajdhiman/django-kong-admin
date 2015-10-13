@@ -52,7 +52,7 @@ django-kong-admin
 
 A reusable Django App to manage a Kong service (https://getkong.org)
 
-The steps you need to take are:
+=== HOWTO ===
 
 .. code:: bash
 

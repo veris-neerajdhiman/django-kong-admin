@@ -9,9 +9,6 @@ from kong_admin.models import ConsumerReference, BasicAuthReference, KeyAuthRefe
 from .base import KongProxySyncEngine
 
 
-# WTF: some documentation seems incomplete. Either complete it or remove it (if the code speaks for itself)
-
-
 class ConsumerSyncEngine(KongProxySyncEngine):
     def basic_auth(self):
         return BasicAuthSyncEngine()

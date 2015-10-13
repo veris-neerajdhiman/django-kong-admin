@@ -29,14 +29,14 @@ class APISyncEngine(KongProxySyncEngine):
     def on_publish(self, client, obj):
         try:
             api_struct = client.apis.create_or_update(
-                api_id=obj.kong_id, upstream_url=obj.upstream_url, name=obj.name, request_host=obj.request_host,
-                request_path=obj.request_path, strip_request_path=obj.strip_request_path,
-                preserve_host=obj.preserve_host)
+                api_id=obj.kong_id, upstream_url=obj.upstream_url, name=(obj.name or None),
+                request_host=(obj.request_host or None), request_path=(obj.request_path or None),
+                strip_request_path=obj.strip_request_path, preserve_host=obj.preserve_host)
         except ConflictError:
             api_struct = client.apis.update(
-                name_or_id=(obj.name or obj.request_host), upstream_url=obj.upstream_url, name=obj.name,
-                request_host=obj.request_host, request_path=obj.request_path, strip_request_path=obj.strip_request_path,
-                preserve_host=obj.preserve_host)
+                name_or_id=(obj.name or obj.request_host), upstream_url=obj.upstream_url, name=(obj.name or None),
+                request_host=(obj.request_host or None), request_path=(obj.request_path or None),
+                strip_request_path=obj.strip_request_path, preserve_host=obj.preserve_host)
 
         name = api_struct['name']
 
@@ -108,6 +108,9 @@ class PluginConfigurationSyncEngine(KongProxySyncEngine):
         return plugin_configuration_struct['id']
 
     def on_withdraw_by_id(self, client, kong_id, parent_kong_id=None):
+        """
+        Because a PluginConfiguration always has a parent object (API), we explicitly check whether it is not None
+        """
         assert kong_id is not None
         assert parent_kong_id is not None
 

@@ -178,7 +178,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Publish api
         logic.synchronize_api(self.client, api_ref)
 
-        # Check
+        # Check if remote upstream_url matches the locally known upstream_url
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['upstream_url'], api_ref.upstream_url)
@@ -190,6 +190,9 @@ class APIReferenceLogicTestCase(TestCase):
         with self.assertRaises(ValueError):
             logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
 
+        # Make sure we did not get a Kong ID (meaning it did not sync to Kong)
+        self.assertIsNone(plugin_configuration_ref.kong_id)
+
     def test_sync_plugin_configuration(self):
         # Create api_ref
         api_ref = APIReferenceFactory(upstream_url=fake.url(), request_host=fake.domain_name())
@@ -200,7 +203,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Publish api
         logic.synchronize_api(self.client, api_ref)
 
-        # Check
+        # Check if remote upstream_url matches the locally known upstream_url
         result = self.client.apis.retrieve(api_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['upstream_url'], api_ref.upstream_url)
@@ -232,7 +235,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Publish plugin_configuration
         logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
 
-        # Check
+        # Check if remote plugin name matches the locally known plugin
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
@@ -260,7 +263,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Publish plugin_configuration
         logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
 
-        # Check
+        # Check if remote plugin name matches the locally known plugin
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
@@ -289,7 +292,7 @@ class APIReferenceLogicTestCase(TestCase):
         # Publish plugin_configuration
         logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
 
-        # Check
+        # Check if remote plugin name matches the locally known plugin, and that it is enabled
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
@@ -320,7 +323,8 @@ class APIReferenceLogicTestCase(TestCase):
         # Publish plugin_configuration
         logic.synchronize_plugin_configuration(self.client, plugin_configuration_ref)
 
-        # Check
+        # Check if remote plugin name matches the locally known plugin, and that the configuration matches the locally
+        #   known configuration
         result = self.client.apis.plugins(api_ref.kong_id).retrieve(plugin_configuration_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['name'], Plugins.label(plugin_configuration_ref.plugin))
@@ -378,7 +382,7 @@ class ConsumerReferenceLogicTestCase(TestCase):
         logic.synchronize_consumer(self.client, consumer_ref)
         self.assertTrue(consumer_ref.synchronized)
 
-        # Check kong
+        # Make sure the remote username matches the locally known username
         result = self.client.consumers.retrieve(consumer_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['username'], consumer_ref.username)
@@ -394,7 +398,7 @@ class ConsumerReferenceLogicTestCase(TestCase):
         logic.synchronize_consumer(self.client, consumer_ref)
         self.assertTrue(consumer_ref.synchronized)
 
-        # Check kong
+        # Make sure the remote username matches the locally known username
         result = self.client.consumers.retrieve(consumer_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['username'], consumer_ref.username)
@@ -410,7 +414,7 @@ class ConsumerReferenceLogicTestCase(TestCase):
         logic.synchronize_consumer(self.client, consumer_ref)
         self.assertTrue(consumer_ref.synchronized)
 
-        # Check kong
+        # Make sure the remote username matches the locally known username
         result = self.client.consumers.retrieve(consumer_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['username'], consumer_ref.username)
@@ -425,7 +429,7 @@ class ConsumerReferenceLogicTestCase(TestCase):
         logic.synchronize_consumer(self.client, consumer_ref)
         self.assertTrue(consumer_ref.synchronized)
 
-        # Check kong
+        # Make sure the remote username matches the new username
         result = self.client.consumers.retrieve(consumer_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['username'], new_name)
@@ -438,7 +442,7 @@ class ConsumerReferenceLogicTestCase(TestCase):
         logic.synchronize_consumer(self.client, consumer_ref)
         self.assertTrue(consumer_ref.synchronized)
 
-        # Check kong
+        # Make sure the remote username matches the locally known username
         result = self.client.consumers.retrieve(consumer_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['username'], consumer_ref.username)
@@ -462,7 +466,7 @@ class ConsumerReferenceLogicTestCase(TestCase):
         logic.synchronize_consumer(self.client, consumer_ref)
         self.assertTrue(consumer_ref.synchronized)
 
-        # Check kong
+        # Make sure the remote username matches the locally known username
         result = self.client.consumers.retrieve(consumer_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['username'], consumer_ref.username)
@@ -501,7 +505,7 @@ class ConsumerReferenceLogicTestCase(TestCase):
         auth_ref = models.BasicAuthReference.objects.get(id=auth_ref.id)
         self.assertIsNotNone(auth_ref.kong_id)
 
-        # Check kong
+        # Make sure the remote username matches the locally known username
         result = self.client.consumers.basic_auth(consumer_ref.kong_id).retrieve(auth_ref.kong_id)
         self.assertIsNotNone(result)
         self.assertEqual(result['username'], auth_ref.username)

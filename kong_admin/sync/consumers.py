@@ -45,10 +45,11 @@ class ConsumerSyncEngine(KongProxySyncEngine):
         """
         try:
             consumer_struct = client.consumers.create_or_update(
-                consumer_id=obj.kong_id, username=obj.username, custom_id=obj.custom_id)
+                consumer_id=obj.kong_id, username=(obj.username or None), custom_id=(obj.custom_id or None))
         except ConflictError:
             consumer_struct = client.consumers.update(
-                username_or_id=(obj.username or obj.kong_id), username=obj.username, custom_id=obj.custom_id)
+                username_or_id=(obj.username or obj.kong_id), username=(obj.username or None),
+                custom_id=(obj.custom_id or None))
         return uuid.UUID(consumer_struct['id'])
 
     def on_withdraw_by_id(self, client, kong_id, parent_kong_id=None):
@@ -169,8 +170,8 @@ class OAuth2SyncEngine(ConsumerAuthSyncEngine):
         :return: The uuid of the entity that has been published
         """
         auth_struct = self.get_auth_client(client, obj.consumer.kong_id).create_or_update(
-            oauth2_id=obj.kong_id, name=obj.name, redirect_uri=obj.redirect_uri, client_id=obj.client_id,
-            client_secret=obj.client_secret)
+            oauth2_id=obj.kong_id, name=obj.name, redirect_uri=obj.redirect_uri, client_id=(obj.client_id or None),
+            client_secret=(obj.client_secret or None))
 
         client_id = auth_struct['client_id']
         client_secret = auth_struct['client_secret']

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 import logging
+from six import text_type
 
 from django.db import transaction
 from django.utils import timezone
@@ -31,7 +32,7 @@ class KongProxySyncEngine(with_metaclass(ABCMeta, object)):
     @abstractmethod
     def is_published(self, client, kong_id, parent_kong_id=None):
         """
-        Caleld to check whether an object is known at kong
+        Called to check whether an object is known at kong
 
         :param client:
         :param kong_id:
@@ -62,7 +63,7 @@ class KongProxySyncEngine(with_metaclass(ABCMeta, object)):
         :param kong_id:
         :type kong_id: uuid.UUID
         :param parent_kong_id: Optional reference to a parent object
-        :type parent_kong_id: uuid.UUID
+        :type parent_kong_id: six.text_type | uuid.UUID
         """
 
     def on_withdraw(self, client, obj):
@@ -80,7 +81,7 @@ class KongProxySyncEngine(with_metaclass(ABCMeta, object)):
             return obj
 
         return self.on_withdraw_by_id(
-            client, str(obj.kong_id), str(parent_object.kong_id) if parent_object is not None else None)
+            client, text_type(obj.kong_id), str(parent_object.kong_id) if parent_object is not None else None)
 
     def before_publish(self, client, obj):
         parent_object = self.get_parent_object(obj)

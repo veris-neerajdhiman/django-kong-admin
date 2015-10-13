@@ -32,13 +32,11 @@ def synchronize_apis(client, queryset=None):
 
 
 def publish_plugin_configuration(client, obj):
-    obj = get_api_sync_engine().plugins().publish(client, obj)
-    return obj
+    return get_api_sync_engine().plugins().publish(client, obj)
 
 
 def withdraw_plugin_configuration(client, obj):
-    obj = get_api_sync_engine().plugins().withdraw(client, obj)
-    return obj
+    return get_api_sync_engine().plugins().withdraw(client, obj)
 
 
 def enable_plugin_configuration(client, obj, enabled=True):

@@ -11,7 +11,6 @@ env = environ.Env(
 )
 SITE_ROOT = BASE_DIR()
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 SECRET_KEY = 'K-pF++*|+9alwjd4834327E;a'
 
 ALLOWED_HOSTS = []

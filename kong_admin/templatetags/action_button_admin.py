@@ -3,7 +3,8 @@ from django.template import Library
 
 register = Library()
 
-@register.inclusion_tag('kong_admin/custom_admin_actions.html', takes_context=True)
+
+@register.inclusion_tag('kong_admin/action_button_admin_actions.html', takes_context=True)
 def custom_admin_actions(context):
     """
     Track the number of times the action field has been rendered on the page,

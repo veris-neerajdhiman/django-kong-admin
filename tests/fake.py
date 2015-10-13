@@ -7,7 +7,6 @@ from faker.providers import BaseProvider
 fake = Factory.create()
 
 
-# Create a provider for API Names (TODO: This is taken copy-paste from python-kong. Fix duplication!)
 class APIInfoProvider(BaseProvider):
     def api_name(self):
         return fake.name().replace(' ', '')
@@ -21,7 +20,8 @@ class APIInfoProvider(BaseProvider):
 
 class ConsumerInfoProvider(BaseProvider):
     def consumer_name(self):
-        return fake.lexify('??????')
+        t = fake.lexify('??????ėčń')
+        return t
 
 fake.add_provider(APIInfoProvider)
 fake.add_provider(ConsumerInfoProvider)

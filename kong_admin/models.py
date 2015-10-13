@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from six import python_2_unicode_compatible
+from six import python_2_unicode_compatible, text_type
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -53,14 +53,9 @@ class APIReference(KongProxyModel):
         verbose_name_plural = _('API References')
 
     def __str__(self):
-        result = self.upstream_url if not self.name else '%s (%s)' % (self.name, self.upstream_url)
-        return str(result)
+        return text_type(self.upstream_url if not self.name else '%s (%s)' % (self.name, self.upstream_url))
 
     def clean(self):
-        self.name = self.name or None  # Don't store empty strings
-        self.request_host = self.request_host or None  # Don't store empty strings
-        self.request_path = self.request_path or None  # Don't store empty strings
-
         if not self.request_host and not self.request_path:
             raise ValidationError('At least one of the parameters "request_host" and "request_path" should be set')
 
@@ -93,7 +88,7 @@ class PluginConfigurationReference(KongProxyModel):
         unique_together = [('plugin', 'api')]
 
     def __str__(self):
-        return str(Plugins.label(self.plugin))
+        return text_type(Plugins.label(self.plugin))
 
 
 @python_2_unicode_compatible
@@ -113,9 +108,6 @@ class ConsumerReference(KongProxyModel):
         return self.username or self.custom_id
 
     def clean(self):
-        self.username = self.username or None  # Don't store empty strings
-        self.custom_id = self.custom_id or None  # Don't store empty strings
-
         if not self.username and not self.custom_id:
             raise ValidationError('At least one of the parameters "username" and "custom_id" should be set')
 
@@ -175,7 +167,3 @@ class OAuth2Reference(ConsumerAuthentication):
 
     def __str__(self):
         return 'OAuth2Reference(name: %s)' % self.name
-
-    def clean(self):
-        self.client_id = self.client_id or None  # Don't store empty strings
-        self.client_secret = self.client_secret or None  # Don't store empty strings

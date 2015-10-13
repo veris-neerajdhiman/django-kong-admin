@@ -8,4 +8,5 @@ class KongAdminConfig(AppConfig):
     verbose_name = 'Kong'
 
     def ready(self):
-        from kong_admin.receivers import __all__
+        # See: http://stackoverflow.com/a/22924754/591217
+        from kong_admin import receivers

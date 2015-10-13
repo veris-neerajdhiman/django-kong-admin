@@ -11,7 +11,7 @@ class ValidatorTestCase(TestCase):
         name_validator('Test')
 
     def test_name_validator_only_numbers(self):
-        name_validator('123āæ')
+        name_validator('123')
 
     def test_name_validator_letters_and_numbers(self):
         name_validator('Test123')

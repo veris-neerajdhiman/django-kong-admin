@@ -6,5 +6,5 @@ from django.core import validators as django_validators
 
 
 name_validator = django_validators.RegexValidator(
-    r'^[\w.~-]+$', _('Enter a valid username. This value may contain only letters, '
-                     'numbers and ~/./-/_ characters.'), 'invalid')
+    r'^[a-zA-Z0-9_.~-]+$', _('Enter a valid username. This value may contain only letters, '
+                             'numbers and ~/./-/_ characters.'), 'invalid')

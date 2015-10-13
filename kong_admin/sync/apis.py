@@ -108,9 +108,10 @@ class PluginConfigurationSyncEngine(KongProxySyncEngine):
         return plugin_configuration_struct['id']
 
     def on_withdraw_by_id(self, client, kong_id, parent_kong_id=None):
+        """
+        Because a PluginConfiguration always has a parent object (API), we explicitly check whether it is not None
+        """
         assert kong_id is not None
         assert parent_kong_id is not None
-
-        # WTF: Why making it an optional kwarg while asserting that it is not None?
 
         client.apis.plugins(parent_kong_id).delete(kong_id)

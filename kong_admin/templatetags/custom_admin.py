@@ -3,6 +3,7 @@ from django.template import Library
 
 register = Library()
 
+
 @register.inclusion_tag('kong_admin/custom_admin_actions.html', takes_context=True)
 def custom_admin_actions(context):
     """

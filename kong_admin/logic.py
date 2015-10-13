@@ -5,9 +5,6 @@ from .factory import get_api_sync_engine, get_consumer_sync_engine
 from .models import APIReference, ConsumerReference, PluginConfigurationReference
 
 
-# WTF: Is this very thin layer necessary? The functions don't seem to do much.
-
-
 def publish_api(client, obj):
     obj = get_api_sync_engine().publish(client, obj)
     if not obj.enabled:
@@ -35,13 +32,11 @@ def synchronize_apis(client, queryset=None):
 
 
 def publish_plugin_configuration(client, obj):
-    obj = get_api_sync_engine().plugins().publish(client, obj)  # WTF: Why not directly returning obj?
-    return obj
+    return get_api_sync_engine().plugins().publish(client, obj)
 
 
 def withdraw_plugin_configuration(client, obj):
-    obj = get_api_sync_engine().plugins().withdraw(client, obj)  # WTF: Why not directly returning obj?
-    return obj
+    return get_api_sync_engine().plugins().withdraw(client, obj)
 
 
 def enable_plugin_configuration(client, obj, enabled=True):

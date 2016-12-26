@@ -12,23 +12,10 @@ from django_enumfield import enum
 
 from .enums import Plugins
 from .validators import name_validator
+from .managers import JSONAwareManager
+
 
 logger = logging.getLogger(__name__)
-
-
-
-
-class JSONAwareManager(models.Manager):
-    """
-    copied form jsonfield2 lib because jsonfield2 is deprecated and 
-    raiseing issues. and since django1.8+ have own jsonfield so no need to use jsonfield2 lib 
-    """
-    def __init__(self, json_fields=[], *args, **kwargs):
-        self.json_fields = json_fields
-        super(JSONAwareManager, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        return JSONAwareQuerySet(self.json_fields, self.model)
 
 
 class KongProxyModel(models.Model):

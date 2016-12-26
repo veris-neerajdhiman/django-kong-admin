@@ -36,13 +36,13 @@ def synchronize_consumer_reference(request, pk, toggle_enable=False):
         request, logic.synchronize_consumer, 'Consumer', obj, toggle_enable=toggle_enable)
 
 
-@staff_member_required
+# @staff_member_required
 def show_config(request):
     """
     This view shows the configuration as it is known by Kong
     """
-    if not request.user.is_staff:
-        return HttpResponse('Only staff is authorized to view the configuration', status=403)
+    # if not request.user.is_staff:
+    #     return HttpResponse('Only staff is authorized to view the configuration', status=403)
 
     kong = factory.get_kong_client()
 

@@ -3,7 +3,9 @@ from __future__ import unicode_literals, print_function
 
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-from jsonfield2.fields import JSONField
+# from jsonfield2.fields import JSONField
+from django.contrib.postgres.fields import JSONField
+
 
 from .models import APIReference, PluginConfigurationReference, ConsumerReference, \
     BasicAuthReference, KeyAuthReference, OAuth2Reference

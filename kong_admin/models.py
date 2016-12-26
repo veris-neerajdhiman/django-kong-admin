@@ -5,13 +5,30 @@ from six import python_2_unicode_compatible, text_type
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.postgres.fields import JSONField
+
 from django_enumfield import enum
-from jsonfield2 import JSONField, JSONAwareManager
+# from jsonfield2 import JSONField, JSONAwareManager # not up-to-date with Django versions
 
 from .enums import Plugins
 from .validators import name_validator
 
 logger = logging.getLogger(__name__)
+
+
+
+
+class JSONAwareManager(models.Manager):
+    """
+    copied form jsonfield2 lib because jsonfield2 is deprecated and 
+    raiseing issues. and since django1.8+ have own jsonfield so no need to use jsonfield2 lib 
+    """
+    def __init__(self, json_fields=[], *args, **kwargs):
+        self.json_fields = json_fields
+        super(JSONAwareManager, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return JSONAwareQuerySet(self.json_fields, self.model)
 
 
 class KongProxyModel(models.Model):

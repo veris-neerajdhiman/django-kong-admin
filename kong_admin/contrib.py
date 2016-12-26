@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 import copy
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib.admin import ModelAdmin
 from django.utils.safestring import mark_safe
 
@@ -35,8 +35,8 @@ class ActionButtonModelAdmin(ModelAdmin):
             button_url = ActionButtonModelAdmin._safe_list_display_button_url(button['url']) + r'(?P<pk>\d+)/'
             custom_urls.append(url(r'^%s$' % button_url, button['view']))
 
-        my_urls = patterns("", *custom_urls)
-        return my_urls + urls
+        # my_urls = patterns("", *custom_urls)
+        return custom_urls + urls
 
     def get_list_display(self, request):
         list_display_buttons = self.get_list_display_buttons()
